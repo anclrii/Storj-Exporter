@@ -1,6 +1,5 @@
-import json
 import time
-import urllib2
+import requests
 from prometheus_client import start_http_server
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
@@ -11,8 +10,8 @@ class StorjCollector(object):
     self.sat_data = self.get_sat_data()
 
   def call_api(self,path):
-    return json.load(urllib2.urlopen(
-        "http://127.0.0.1:14002/api/" + path))
+    response=requests.get(url = "http://127.0.0.1:14002/api/" + path)
+    return response.json()
    
   def get_data(self):
     return self.call_api("dashboard")['data']
@@ -44,10 +43,10 @@ class StorjCollector(object):
         yield metric
 
     for array in ['audit','uptime']:
-      for key in self.sat_data.values()[0][array]:
+      for key in list(self.sat_data.values())[0][array]:
         metric = GaugeMetricFamily("storj_sat_" + array + "_" + key, "Storj satellite " + key,labels=["satellite"])
         for sat in self.satellites:
-    	  value = self.sat_data[sat][array][key]
+          value = self.sat_data[sat][array][key]
           metric.add_metric([sat], value)
         yield metric
     
