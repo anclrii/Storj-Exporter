@@ -10,7 +10,7 @@ class StorjCollector(object):
     self.sat_data = self.get_sat_data()
 
   def call_api(self,path):
-    response=requests.get(url = "http://127.0.0.1:14002/api/" + path)
+    response=requests.get(url = "http://storagenode:14002/api/" + path)
     return response.json()
    
   def get_data(self):
