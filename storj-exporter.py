@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 from prometheus_client import start_http_server
@@ -5,12 +6,14 @@ from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
 class StorjCollector(object):
   def __init__(self):
+    self.storj_host_address = os.environ.get('STORJ_HOST_ADDRESS', '127.0.0.1')
+    self.storj_api_port = os.environ.get('STORJ_API_PORT', '14002')
     self.data = self.get_data()
     self.satellites = self.get_satellites()
     self.sat_data = self.get_sat_data()
 
   def call_api(self,path):
-    response=requests.get(url = "http://storagenode:14002/api/" + path)
+    response=requests.get(url = "http://" + self.storj_host_address + ":" + self.storj_api_port + "/api/" + path)
     return response.json()
    
   def get_data(self):
@@ -58,6 +61,7 @@ class StorjCollector(object):
       yield metric
 
 if __name__ == "__main__":
+  storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
   REGISTRY.register(StorjCollector())
-  start_http_server(9651)
+  start_http_server(int(storj_exporter_port))
   while True: time.sleep(1)
