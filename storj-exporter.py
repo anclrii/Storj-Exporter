@@ -8,9 +8,6 @@ class StorjCollector(object):
   def __init__(self):
     self.storj_host_address = os.environ.get('STORJ_HOST_ADDRESS', '127.0.0.1')
     self.storj_api_port = os.environ.get('STORJ_API_PORT', '14002')
-    self.data = self.get_data()
-    self.satellites = self.get_satellites()
-    self.sat_data = self.get_sat_data()
 
   def call_api(self,path):
     response=requests.get(url = "http://" + self.storj_host_address + ":" + self.storj_api_port + "/api/" + path)
@@ -33,6 +30,9 @@ class StorjCollector(object):
     return array  
 
   def collect(self):
+    self.data = self.get_data()
+    self.satellites = self.get_satellites()
+    self.sat_data = self.get_sat_data()
     for key in ['nodeID','wallet','lastPinged','lastPingFromID','lastPingFromAddress','upToDate']:
       value = str(self.data[key])
       metric = InfoMetricFamily("storj_" + key, "Storj " + key, value={key : value})
