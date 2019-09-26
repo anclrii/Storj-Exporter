@@ -34,3 +34,10 @@ Environment variables are available to manage storage node hostname and ports. D
 | STORJ_HOST_ADDRESS | storagenode | 127.0.0.1 |
 | STORJ_API_PORT | 14002 | 14002 |
 | STORJ_EXPORTER_PORT | 9651 | 9651 |
+
+## Support
+Feel free to raise issues if you find any (currently needs more work) and also raise PR if you'd like to contribute.
+
+You can also buy me a coffee with some Ether/Storj if you find this useful:
+
+### `0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
