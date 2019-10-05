@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+import json
 from prometheus_client import start_http_server
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
@@ -36,7 +37,6 @@ class StorjCollector(object):
     for key in ['nodeID','wallet','lastPinged','lastPingFromID','lastPingFromAddress','upToDate']:
       value = str(self.data[key])
       metric = InfoMetricFamily("storj_" + key, "Storj " + key, value={key : value})
-      #metric.add_metric({key : value})
       yield metric
 
     for array in ['diskSpace','bandwidth']:
@@ -59,6 +59,53 @@ class StorjCollector(object):
         value = self.sat_data[sat][key]
         metric.add_metric([sat], value)
       yield metric
+
+    metric = GaugeMetricFamily("storj_sat_month_egress", "Storj satellite egress since current month start", labels=["satellite","type"],)
+    for key in ['repair','audit','usage']:
+      for sat in self.satellites:
+        value=0
+        for day in list(self.sat_data[sat]['bandwidthDaily']):
+          value=value + day['egress'][key]
+        metric.add_metric([sat, key], value)
+    yield metric
+    
+    metric = GaugeMetricFamily("storj_sat_month_ingress", "Storj satellite ingress since current month start", labels=["satellite","type"],)
+    for key in ['repair','usage']:
+      for sat in self.satellites:
+        value=0
+        for day in list(self.sat_data[sat]['bandwidthDaily']):
+          value=value + day['ingress'][key]
+        metric.add_metric([sat, key], value)
+    yield metric
+
+    metric = GaugeMetricFamily("storj_sat_day_egress", "Storj satellite egress since current day start", labels=["satellite","type"],)
+    for key in ['repair','audit','usage']:
+      for sat in self.satellites:
+        value=self.sat_data[sat]['bandwidthDaily'][-1]['egress'][key]
+        metric.add_metric([sat, key], value)
+    yield metric
+
+    metric = GaugeMetricFamily("storj_sat_day_ingress", "Storj satellite ingress since current day start", labels=["satellite","type"],)
+    for key in ['repair','usage']:
+      for sat in self.satellites:
+        value=self.sat_data[sat]['bandwidthDaily'][-1]['ingress'][key]
+        metric.add_metric([sat, key], value)
+    yield metric
+
+
+    metric = GaugeMetricFamily("storj_sat_month_storage", "Storj satellite data stored on disk since current month start", labels=["satellite"],)
+    for sat in self.satellites:
+      value=0
+      for day in list(self.sat_data[sat]['storageDaily']):
+        value=value + day['atRestTotal']
+      metric.add_metric([sat], value)
+    yield metric
+
+    metric = GaugeMetricFamily("storj_sat_day_storage", "Storj satellite data stored on disk since current day start", labels=["satellite"],)
+    for sat in self.satellites:
+      value=self.sat_data[sat]['storageDaily'][-1]['atRestTotal']
+      metric.add_metric([sat], value)
+    yield metric
 
 if __name__ == "__main__":
   storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
