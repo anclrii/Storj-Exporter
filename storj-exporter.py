@@ -30,11 +30,26 @@ class StorjCollector(object):
       array.update({sat : data})
     return array  
 
-  def add_iterable_metrics(self, keys, data, metric):
+  def add_iterable_metrics(self, keys, data, metric, labels = []):
     for key in keys:
-      print("debug: " + key + "=" + str(data[key]))
       value = data[key]
-      metric.add_metric([key], value)
+      metric_labels = [key] + labels
+      metric.add_metric(metric_labels, value)
+    
+  def add_day_sum_metrics(self, key, data, metric, labels = []):
+    value=0
+    for day in data:
+      value=value + day[key]
+    metric_labels = [key] + labels
+    metric.add_metric(metric_labels, value)
+    
+  def add_iterable_day_sum_metrics(self, keys, data, item, metric, labels = []):
+    for key in keys:
+      value=0
+      for day in data:
+        value=value + day[item][key]
+      metric_labels = [key] + labels
+      metric.add_metric(metric_labels, value)
     
   def collect(self):
     self.data = self.get_data()
@@ -71,15 +86,15 @@ class StorjCollector(object):
 
     storj_total_diskspace           = GaugeMetricFamily("storj_total_diskspace",    "Storj total diskspace metrics",                                    labels=["type"])
     storj_total_bandwidth           = GaugeMetricFamily("storj_total_bandwidth",    "Storj total bandwidth metrics",                                    labels=["type"])
-    storj_sat_summary               = GaugeMetricFamily("storj_sat_summary",        "Storj satellite summary metrics",                                  labels=["satellite","type"])    
-    storj_sat_audit                 = GaugeMetricFamily("storj_sat_audit",          "Storj satellite audit metrics",                                    labels=["satellite","type"])
-    storj_sat_uptime                = GaugeMetricFamily("storj_sat_uptime",         "Storj satellite uptime metrics",                                   labels=["satellite","type"])
-    storj_sat_month_egress          = GaugeMetricFamily("storj_sat_month_egress",   "Storj satellite egress since current month start",                 labels=["satellite","type"],)
-    storj_sat_month_ingress         = GaugeMetricFamily("storj_sat_month_ingress",  "Storj satellite ingress since current month start",                labels=["satellite","type"],)
-    storj_sat_day_egress            = GaugeMetricFamily("storj_sat_day_egress",     "Storj satellite egress since current day start",                   labels=["satellite","type"],)
-    storj_sat_day_ingress           = GaugeMetricFamily("storj_sat_day_ingress",    "Storj satellite ingress since current day start",                  labels=["satellite","type"],)
-    storj_sat_month_storage         = GaugeMetricFamily("storj_sat_month_storage",  "Storj satellite data stored on disk since current month start",    labels=["satellite"],)
-    storj_sat_day_storage           = GaugeMetricFamily("storj_sat_day_storage",    "Storj satellite data stored on disk since current day start",      labels=["satellite"],)
+    storj_sat_summary               = GaugeMetricFamily("storj_sat_summary",        "Storj satellite summary metrics",                                  labels=["type", "satellite"])    
+    storj_sat_audit                 = GaugeMetricFamily("storj_sat_audit",          "Storj satellite audit metrics",                                    labels=["type", "satellite"])
+    storj_sat_uptime                = GaugeMetricFamily("storj_sat_uptime",         "Storj satellite uptime metrics",                                   labels=["type", "satellite"])
+    storj_sat_month_egress          = GaugeMetricFamily("storj_sat_month_egress",   "Storj satellite egress since current month start",                 labels=["type", "satellite"])
+    storj_sat_month_ingress         = GaugeMetricFamily("storj_sat_month_ingress",  "Storj satellite ingress since current month start",                labels=["type", "satellite"])
+    storj_sat_day_egress            = GaugeMetricFamily("storj_sat_day_egress",     "Storj satellite egress since current day start",                   labels=["type", "satellite"])
+    storj_sat_day_ingress           = GaugeMetricFamily("storj_sat_day_ingress",    "Storj satellite ingress since current day start",                  labels=["type", "satellite"])
+    storj_sat_month_storage         = GaugeMetricFamily("storj_sat_month_storage",  "Storj satellite data stored on disk since current month start",    labels=["type", "satellite"])
+    storj_sat_day_storage           = GaugeMetricFamily("storj_sat_day_storage",    "Storj satellite data stored on disk since current day start",      labels=["type", "satellite"])
     
     self.add_iterable_metrics(['used','available'], self.data["diskSpace"], storj_total_diskspace)
     self.add_iterable_metrics(['used','available'], self.data["bandwidth"], storj_total_bandwidth)
@@ -93,48 +108,55 @@ class StorjCollector(object):
 
     for sat in self.satellites:
       ## summary
-      self.add_iterable_metrics(['storageSummary','bandwidthSummary'], self.sat_data[sat], storj_sat_summary)
+      self.add_iterable_metrics(['storageSummary','bandwidthSummary'], self.sat_data[sat], storj_sat_summary, [sat])
       # for key in ['storageSummary','bandwidthSummary']:
       #   value = self.sat_data[sat][key]
       #   storj_sat_summary.add_metric([sat,key], value)
 
       ## audit
-      for key in list(self.sat_data.values())[0]["audit"]:
-        value = self.sat_data[sat]["audit"][key]
-        storj_sat_audit.add_metric([sat, key], value)
+      self.add_iterable_metrics(list(self.sat_data.values())[0]["audit"], self.sat_data[sat]["audit"], storj_sat_audit, [sat])
+     # for key in list(self.sat_data.values())[0]["audit"]:
+     #   value = self.sat_data[sat]["audit"][key]
+     #   storj_sat_audit.add_metric([sat, key], value)
 
       ## uptime
-      for key in list(self.sat_data.values())[0]["uptime"]:
-        value = self.sat_data[sat]["uptime"][key]
-        storj_sat_uptime.add_metric([sat, key], value)
+      self.add_iterable_metrics(list(self.sat_data.values())[0]["uptime"], self.sat_data[sat]["uptime"], storj_sat_uptime, [sat])
+     # for key in list(self.sat_data.values())[0]["uptime"]:
+     #   value = self.sat_data[sat]["uptime"][key]
+     #   storj_sat_uptime.add_metric([sat, key], value)
 
-      for key in ['repair','audit','usage']:
-        value=0
-        for day in list(self.sat_data[sat]['bandwidthDaily']):
-          value=value + day['egress'][key]
-        storj_sat_month_egress.add_metric([sat, key], value)
+      self.add_iterable_day_sum_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'], "egress", storj_sat_month_egress, [sat])
+#      for key in ['repair','audit','usage']:
+#        value=0
+#        for day in list(self.sat_data[sat]['bandwidthDaily']):
+#          value=value + day['egress'][key]
+#        storj_sat_month_egress.add_metric([sat, key], value)
     
-      for key in ['repair','usage']:
-        value=0
-        for day in list(self.sat_data[sat]['bandwidthDaily']):
-          value=value + day['ingress'][key]
-        storj_sat_month_ingress.add_metric([sat, key], value)
+      self.add_iterable_day_sum_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'], "ingress", storj_sat_month_ingress, [sat])
+     # for key in ['repair','usage']:
+     #   value=0
+     #   for day in list(self.sat_data[sat]['bandwidthDaily']):
+     #     value=value + day['ingress'][key]
+     #   storj_sat_month_ingress.add_metric([sat, key], value)
 
-      for key in ['repair','audit','usage']:
-        value=self.sat_data[sat]['bandwidthDaily'][-1]['egress'][key]
-        storj_sat_day_egress.add_metric([sat, key], value)
+      self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat])
+    #  for key in ['repair','audit','usage']:
+    #    value=self.sat_data[sat]['bandwidthDaily'][-1]['egress'][key]
+    #    storj_sat_day_egress.add_metric([sat, key], value)
 
-      for key in ['repair','usage']:
-        value=self.sat_data[sat]['bandwidthDaily'][-1]['ingress'][key]
-        storj_sat_day_ingress.add_metric([sat, key], value)
+      self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
+     # for key in ['repair','usage']:
+     #   value=self.sat_data[sat]['bandwidthDaily'][-1]['ingress'][key]
+     #   storj_sat_day_ingress.add_metric([sat, key], value)
 
-      value=0
-      for day in list(self.sat_data[sat]['storageDaily']):
-        value=value + day['atRestTotal']
-      storj_sat_month_storage.add_metric([sat], value)
+      self.add_day_sum_metrics('atRestTotal', self.sat_data[sat]['storageDaily'], storj_sat_month_storage, [sat])
+     # value=0
+     # for day in list(self.sat_data[sat]['storageDaily']):
+     #   value=value + day['atRestTotal']
+     # storj_sat_month_storage.add_metric([sat], value)
 
-      value=self.sat_data[sat]['storageDaily'][-1]['atRestTotal']
-      storj_sat_day_storage.add_metric([sat], value)
+#      value=self.sat_data[sat]['storageDaily'][-1]['atRestTotal']
+      storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
     
     yield storj_total_diskspace
     yield storj_total_bandwidth
