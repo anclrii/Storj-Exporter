@@ -93,7 +93,6 @@ class StorjCollector(object):
     storj_sat_month_ingress         = GaugeMetricFamily("storj_sat_month_ingress",  "Storj satellite ingress since current month start",                labels=["type", "satellite"])
     storj_sat_day_egress            = GaugeMetricFamily("storj_sat_day_egress",     "Storj satellite egress since current day start",                   labels=["type", "satellite"])
     storj_sat_day_ingress           = GaugeMetricFamily("storj_sat_day_ingress",    "Storj satellite ingress since current day start",                  labels=["type", "satellite"])
-    storj_sat_month_storage         = GaugeMetricFamily("storj_sat_month_storage",  "Storj satellite data stored on disk since current month start",    labels=["type", "satellite"])
     storj_sat_day_storage           = GaugeMetricFamily("storj_sat_day_storage",    "Storj satellite data stored on disk since current day start",      labels=["type", "satellite"])
     
     self.add_iterable_metrics(['used','available'], self.data["diskSpace"], storj_total_diskspace)
@@ -107,7 +106,6 @@ class StorjCollector(object):
       self.add_iterable_day_sum_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'], "ingress", storj_sat_month_ingress, [sat])
       self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat])
       self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
-      self.add_day_sum_metrics('atRestTotal', self.sat_data[sat]['storageDaily'], storj_sat_month_storage, [sat])
       storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
     
     yield storj_total_diskspace
@@ -119,7 +117,6 @@ class StorjCollector(object):
     yield storj_sat_month_ingress
     yield storj_sat_day_egress
     yield storj_sat_day_ingress
-    yield storj_sat_month_storage
     yield storj_sat_day_storage
 
 if __name__ == "__main__":
