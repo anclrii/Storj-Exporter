@@ -3,7 +3,12 @@
 
 Storj exporter for prometheus written in python.
 This exporter pulls information from storj storage node api for `dashboard` and `satellite` metrics.
-Tested with storj storage node version `0.21.1`
+
+Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple Storj storage nodes.
+
+![combined dashboard](https://github.com/anclrii/Storj-Exporter-Dashboard/raw/master/combined%20dashboard.png)
+
+Tested with storj storage node version `v0.22.1`
 
 ## Usage
 
