@@ -46,8 +46,9 @@ class StorjCollector(object):
   def add_iterable_day_sum_metrics(self, keys, data, item, metric, labels = []):
     for key in keys:
       value=0
-      for day in data:
-        value=value + day[item][key]
+      if data:
+        for day in data:
+          value=value + day[item][key]
       metric_labels = [key] + labels
       metric.add_metric(metric_labels, value)
     
@@ -104,9 +105,10 @@ class StorjCollector(object):
       self.add_iterable_metrics(list(self.sat_data.values())[0]["uptime"], self.sat_data[sat]["uptime"], storj_sat_uptime, [sat])
       self.add_iterable_day_sum_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'], "egress", storj_sat_month_egress, [sat])
       self.add_iterable_day_sum_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'], "ingress", storj_sat_month_ingress, [sat])
-      self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat])
-      self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
-      storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
+      if self.sat_data[sat]['bandwidthDaily']:
+        self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat])
+        self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
+        storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
     
     yield storj_total_diskspace
     yield storj_total_bandwidth
