@@ -38,8 +38,9 @@ class StorjCollector(object):
     
   def add_day_sum_metrics(self, key, data, metric, labels = []):
     value=0
-    for day in data:
-      value=value + day[key]
+    if data:
+      for day in data:
+        value=value + day[key]
     metric_labels = [key] + labels
     metric.add_metric(metric_labels, value)
     
@@ -108,6 +109,7 @@ class StorjCollector(object):
       if self.sat_data[sat]['bandwidthDaily']:
         self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat])
         self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
+      if self.sat_data[sat]['storageDaily']:
         storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
     
     yield storj_total_diskspace
