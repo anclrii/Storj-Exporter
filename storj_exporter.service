@@ -1,0 +1,13 @@
+[Unit]
+Description=Storj Exporter
+Wants=docker.service
+After=docker.service
+
+[Service]
+User=storj_exporter
+Group=storj_exporter
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/storj-exporter.py
+
+[Install]
+WantedBy=multi-user.target
