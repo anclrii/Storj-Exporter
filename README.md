@@ -30,6 +30,12 @@ Clone this repo and cd, then
 ### Standalone script
 
     python3 storj-exporter.py
+    
+### Install systemd service
+    
+    cp storj_exporter.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl restart storj_exporter
 
 ## Variables
 Environment variables are available to manage storage node hostname and ports. Defaults are different for Docker/Standalone, mainly 127.0.0.1 is a default api host for standalone.
