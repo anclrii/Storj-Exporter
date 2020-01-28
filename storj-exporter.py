@@ -35,7 +35,7 @@ class StorjCollector(object):
       value = data[key]
       metric_labels = [key] + labels
       metric.add_metric(metric_labels, value)
-    
+
   def add_day_sum_metrics(self, key, data, metric, labels = []):
     value=0
     if data:
@@ -96,6 +96,7 @@ class StorjCollector(object):
     storj_sat_day_egress            = GaugeMetricFamily("storj_sat_day_egress",     "Storj satellite egress since current day start",                   labels=["type", "satellite"])
     storj_sat_day_ingress           = GaugeMetricFamily("storj_sat_day_ingress",    "Storj satellite ingress since current day start",                  labels=["type", "satellite"])
     storj_sat_day_storage           = GaugeMetricFamily("storj_sat_day_storage",    "Storj satellite data stored on disk since current day start",      labels=["type", "satellite"])
+    storj_sat_disqualified          = GaugeMetricFamily("storj_sat_disqualified",   "Storj satellite disqualification value",                           labels=["disqualified", "satellite"])
     
     self.add_iterable_metrics(['used','available'], self.data["diskSpace"], storj_total_diskspace)
     self.add_iterable_metrics(['used','available'], self.data["bandwidth"], storj_total_bandwidth)
@@ -111,7 +112,10 @@ class StorjCollector(object):
         self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat])
       if self.sat_data[sat]['storageDaily']:
         storj_sat_day_storage.add_metric(["atRestTotal", sat], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
-    
+      
+    for satellite in self.data['satellites']:
+      storj_sat_disqualified.add_metric([str(satellite['disqualified']),str(satellite['id'])], 0)
+
     yield storj_total_diskspace
     yield storj_total_bandwidth
     yield storj_sat_summary
@@ -122,6 +126,7 @@ class StorjCollector(object):
     yield storj_sat_day_egress
     yield storj_sat_day_ingress
     yield storj_sat_day_storage
+    yield storj_sat_disqualified
 
 if __name__ == "__main__":
   storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
