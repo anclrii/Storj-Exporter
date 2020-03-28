@@ -15,7 +15,7 @@ class StorjCollector(object):
     return response.json()
    
   def get_data(self):
-    return self.call_api("dashboard")['data']
+    return self.call_api("sno/")
 
   def get_satellites(self):
     satellites = []
@@ -26,7 +26,7 @@ class StorjCollector(object):
   def get_sat_data(self):
     array = {}
     for sat in self.satellites:
-      data = self.call_api("satellite/" + sat)['data']
+      data = self.call_api("sno/satellite/" + sat)
       array.update({sat : data})
     return array  
 
