@@ -28,6 +28,7 @@ class StorjCollector(object):
     for sat, value in self.satellites.items():
       data = self.call_api("sno/satellite/" + value['id']) # ['data']
       data.update({'disqualified': value['disqualified']})
+      data.update({'suspended': value['suspended']})
       data.update({'url': value['url']})
       array.update({sat : data})
     return array
@@ -62,7 +63,7 @@ class StorjCollector(object):
     self.satellites = self.get_satellites()
     self.sat_data = self.get_sat_data()
 
-    for key in ['nodeID','wallet','lastPinged','lastPingFromID','lastPingFromAddress','upToDate','version','allowedVersion']:
+    for key in ['nodeID','wallet','lastPinged','upToDate','version','allowedVersion']:
       value = str(self.data[key])
       metric = InfoMetricFamily("storj_" + key, "Storj " + key, value={key : value})
       yield metric
@@ -82,7 +83,7 @@ class StorjCollector(object):
     self.add_iterable_metrics(['used','available'], self.data["bandwidth"], storj_total_bandwidth)
 
     for sat in self.satellites:
-      self.add_iterable_metrics(['storageSummary','bandwidthSummary','disqualified'], self.sat_data[sat], storj_sat_summary, [sat, self.sat_data[sat]['url'], self.sat_data[sat]['url']])
+      self.add_iterable_metrics(['storageSummary','bandwidthSummary','disqualified','suspended'], self.sat_data[sat], storj_sat_summary, [sat, self.sat_data[sat]['url'], self.sat_data[sat]['url']])
       self.add_iterable_metrics(list(self.sat_data.values())[0]["audit"], self.sat_data[sat]["audit"], storj_sat_audit, [sat, self.sat_data[sat]['url']])
       self.add_iterable_metrics(list(self.sat_data.values())[0]["uptime"], self.sat_data[sat]["uptime"], storj_sat_uptime, [sat, self.sat_data[sat]['url']])
       self.add_iterable_day_sum_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'], "egress", storj_sat_month_egress, [sat, self.sat_data[sat]['url']])
