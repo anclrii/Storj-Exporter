@@ -27,8 +27,8 @@ class StorjCollector(object):
     array = {}
     for sat, value in self.satellites.items():
       data = self.call_api("sno/satellite/" + value['id']) # ['data']
-      data.update({'disqualified': value['disqualified']})
-      data.update({'suspended': value['suspended']})
+      data.update({'disqualified': 1}) if value['disqualified'] else data.update({'disqualified': 0})
+      data.update({'suspended': 1}) if value['suspended'] else data.update({'suspended': 0})
       data.update({'url': value['url']})
       array.update({sat : data})
     return array
