@@ -103,6 +103,27 @@ class StorjCollector(object):
       metric_family   = GaugeMetricFamily
       yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
 
+  def add_payout_metrics(self):
+    data=self.payout["currentMonth"]
+    documentation="Storj estimated payouts for current month"
+    metric_name="storj_payout_currentMonth"
+    metric_family=GaugeMetricFamily
+    keys=['egressBandwidth', 'egressBandwidthPayout', 'egressRepairAudit', 'egressRepairAuditPayout', 'diskSpace', 'diskSpacePayout', 'heldRate', 'payout', 'held']
+    labels=["type"]
+    yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
+
+  def dict_to_metric(self, dict, metric_name, documentation, metric_family, keys, labels ):
+    if dict:
+      metric = metric_family(metric_name, documentation, labels=labels)
+      for key in keys:
+        value = 0
+        if dict[key]:
+          value = dict[key]
+        metric_labels = [key] + labels
+        metric.add_metric(metric_labels, value)      
+      #self.add_iterable_metrics(keys, array, metric)
+      yield metric
+
   def add_sat_metrics(self):
     if 'satellites' in self.node_data:
       for sat in self.node_data['satellites']:
