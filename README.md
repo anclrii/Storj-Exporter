@@ -45,7 +45,7 @@ Clone this repo and cd, then
 #### Move storj_exporter to binary directory
 
     mv Storj-Exporter/storj-exporter.py /usr/local/bin/
-    chown storj-expoj_exporter:storj_exporter /usr/local/bin/storj-exporter.py
+    chown storj_exporter:storj_exporter /usr/local/bin/storj-exporter.py
     chmod +x /usr/local/bin/storj-exporter.py
    
 #### Install systemd service and set to start on boot
