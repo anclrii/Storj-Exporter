@@ -7,139 +7,186 @@ from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
 class StorjCollector(object):
   def __init__(self):
-    self.data = None
-    self.payout = None
-    self.satellites = {}
-    self.sat_data = {}
+    self.node_data = None
     self.storj_host_address = os.environ.get('STORJ_HOST_ADDRESS', '127.0.0.1')
     self.storj_api_port = os.environ.get('STORJ_API_PORT', '14002')
-    self.baseurl = "http://" + self.storj_host_address + ":" + self.storj_api_port + "/"
-    self.basepath = "api/" # 2do - move trailing snash to individual requests
-
-  def call_api(self,path):
+    self.storj_collectors = os.environ.get('STORJ_COLLECTORS', 'payout sat').split()
+    self.baseurl = 'http://' + self.storj_host_address + ':' + self.storj_api_port + '/api/'
+    
+  def call_api(self, path):
     response = None
     try:
-      response=requests.get(url = self.baseurl + self.basepath + path)
-      response=response.json()
+      response=requests.get(url = self.baseurl + path).json()
     except:
       pass
     return response
    
-  def get_data(self):
-    self.data = self.call_api("sno/")
+  def get_node_data(self):
+    self.node_data = self.call_api('sno/')
 
-  def get_payout(self):
-    self.payout = self.call_api("sno/estimated-payout")
+  def get_node_payout_data(self):
+    self.node_data['payout'] = self.call_api('sno/estimated-payout')
 
-  def get_satellites(self):
-    if self.data:
-      for item in self.data['satellites']:
-        self.satellites.update({item['id']: item})
+  def get_sat_data(self, sat):
+    sat['sat_data'] = self.call_api('sno/satellite/' + sat['id'])
+    if isinstance(sat['sat_data'], dict):
+      sat['sat_data'].update(self.sum_sat_daily_keys(sat['sat_data'], 'bandwidthDaily', ['repair','audit','usage'], 'egress'))
+      sat['sat_data'].update(self.sum_sat_daily_keys(sat['sat_data'], 'bandwidthDaily', ['repair','usage'], 'ingress'))
+          
+  def sum_sat_daily_keys(self, daily_data_dict, daily_data_key, data_types, daily_data_path):
+    sum_month_dict = daily_data_dict['sum_' + daily_data_key + '_' + daily_data_path ] = {}
+    if daily_data_key in daily_data_dict:
+      for day in daily_data_dict[daily_data_key]:
+        for data_type in data_types:
+          if data_type not in sum_month_dict:
+            sum_month_dict[data_type] = 0.0
+          if daily_data_path in day and data_type in day[daily_data_path]: 
+            day_value = day[daily_data_path][data_type]
+            if day_value:
+              sum_month_dict.update({data_type: (sum_month_dict[data_type] + day_value)})
+    return daily_data_dict
 
-  def get_sat_data(self):
-    for sat, value in self.satellites.items():
-      data = self.call_api("sno/satellite/" + value['id']) # ['data']
-      data.update({'disqualified': 1}) if value['disqualified'] else data.update({'disqualified': 0})
-      data.update({'suspended': 1}) if value['suspended'] else data.update({'suspended': 0})
-      data.update({'url': value['url']})
-      self.sat_data.update({sat : data})
-
-  def add_iterable_metrics(self, keys, data, metric, labels = []):
-    for key in keys:
-      value = 0
-      if data[key]:
-        value = data[key]
-      metric_labels = [key] + labels
-      metric.add_metric(metric_labels, value)
-    
-  def add_iterable_day_sum_metrics(self, keys, data, item, metric, labels = []):
-    for key in keys:
-      value = 0
-      if data:
-        for day in data: # 2do - sum these before adding metrics instead so that use dict_to_metric can be used with them
-          value=value + day[item][key]
-      metric_labels = [key] + labels
-      metric.add_metric(metric_labels, value)
-    
-  def add_node_metrics(self): ## 2do - rewrite as add_payout_metrics
-    if self.data:
-      for key in ['nodeID','wallet','lastPinged','upToDate','version','allowedVersion','startedAt']:
-        value = str(self.data[key])
-        metric = InfoMetricFamily("storj_" + key, "Storj " + key, value={key : value})
-        yield metric
-      storj_total_diskspace = GaugeMetricFamily("storj_total_diskspace", "Storj total diskspace metrics", labels=["type"])
-      storj_total_bandwidth = GaugeMetricFamily("storj_total_bandwidth", "Storj total bandwidth metrics", labels=["type"])
-      self.add_iterable_metrics(['used','available','trash'], self.data["diskSpace"], storj_total_diskspace)
-      self.add_iterable_metrics(['used','available'], self.data["bandwidth"], storj_total_bandwidth)
-      yield storj_total_diskspace
-      yield storj_total_bandwidth
-
-  def add_payout_metrics(self):
-    data=self.payout["currentMonth"]
-    documentation="Storj estimated payouts for current month"
-    metric_name="storj_payout_currentMonth"
-    metric_family=GaugeMetricFamily
-    keys=['egressBandwidth', 'egressBandwidthPayout', 'egressRepairAudit', 'egressRepairAuditPayout', 'diskSpace', 'diskSpacePayout', 'heldRate', 'payout', 'held']
-    labels=["type"]
-    yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
-
-  def dict_to_metric(self, dict, metric_name, documentation, metric_family, keys, labels ):
+  def dict_to_metric(self, dict, metric_name, documentation, metric_family, keys, labels,label_values=[] ):
     if dict:
       metric = metric_family(metric_name, documentation, labels=labels)
       for key in keys:
-        value = 0
-        if dict[key]:
-          value = dict[key]
-        metric_labels = [key] + labels
-        metric.add_metric(metric_labels, value)      
-      #self.add_iterable_metrics(keys, array, metric)
+        value = 0.0
+        if key in dict:
+          key_label_values = [key] + label_values
+          if metric_family == InfoMetricFamily:
+            value = {key : str(dict[key])}
+          elif isinstance(dict[key],(int, float)):
+            value = dict[key]
+          metric.add_metric(key_label_values, value)      
       yield metric
 
-  def add_sat_metrics(self):
-    if self.satellites:
-      self.get_sat_data()
-      storj_sat_summary               = GaugeMetricFamily("storj_sat_summary",        "Storj satellite summary metrics",                                  labels=["type", "satellite", "url"])    
-      storj_sat_audit                 = GaugeMetricFamily("storj_sat_audit",          "Storj satellite audit metrics",                                    labels=["type", "satellite", "url"])
-      storj_sat_uptime                = GaugeMetricFamily("storj_sat_uptime",         "Storj satellite uptime metrics",                                   labels=["type", "satellite", "url"])
-      storj_sat_month_egress          = GaugeMetricFamily("storj_sat_month_egress",   "Storj satellite egress since current month start",                 labels=["type", "satellite", "url"])
-      storj_sat_month_ingress         = GaugeMetricFamily("storj_sat_month_ingress",  "Storj satellite ingress since current month start",                labels=["type", "satellite", "url"])
-      storj_sat_day_egress            = GaugeMetricFamily("storj_sat_day_egress",     "Storj satellite egress since current day start",                   labels=["type", "satellite", "url"])
-      storj_sat_day_ingress           = GaugeMetricFamily("storj_sat_day_ingress",    "Storj satellite ingress since current day start",                  labels=["type", "satellite", "url"])
-      storj_sat_day_storage           = GaugeMetricFamily("storj_sat_day_storage",    "Storj satellite data stored on disk since current day start",      labels=["type", "satellite", "url"])
-      storj_sat_nodeJoinedAt          = InfoMetricFamily("storj_sat_nodeJoinedAt",   "Storj satellite nodeJoinedAt", labels=["satellite", "url"])
-      
-      for sat in self.satellites:
-        self.add_iterable_metrics(['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore','disqualified','suspended'], self.sat_data[sat], storj_sat_summary, [sat, self.sat_data[sat]['url'], self.sat_data[sat]['url']])
-        self.add_iterable_metrics(list(self.sat_data.values())[0]["audit"], self.sat_data[sat]["audit"], storj_sat_audit, [sat, self.sat_data[sat]['url']])
-        self.add_iterable_metrics(list(self.sat_data.values())[0]["uptime"], self.sat_data[sat]["uptime"], storj_sat_uptime, [sat, self.sat_data[sat]['url']])
-        self.add_iterable_day_sum_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'], "egress", storj_sat_month_egress, [sat, self.sat_data[sat]['url']])
-        self.add_iterable_day_sum_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'], "ingress", storj_sat_month_ingress, [sat, self.sat_data[sat]['url']])
-        if self.sat_data[sat]['bandwidthDaily']:
-          self.add_iterable_metrics(['repair','audit','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['egress'], storj_sat_day_egress, [sat, self.sat_data[sat]['url']])
-          self.add_iterable_metrics(['repair','usage'], self.sat_data[sat]['bandwidthDaily'][-1]['ingress'], storj_sat_day_ingress, [sat, self.sat_data[sat]['url']])
-        if self.sat_data[sat]['storageDaily']:
-          storj_sat_day_storage.add_metric(["atRestTotal", sat, self.sat_data[sat]['url']], self.sat_data[sat]['storageDaily'][-1]['atRestTotal'])
-        storj_sat_nodeJoinedAt.add_metric([sat, self.sat_data[sat]['url']],{'nodeJoinedAt' : self.sat_data[sat]['nodeJoinedAt']})
+  def add_node_metrics(self):
+    self.get_node_data()
+    if self.node_data:
+      labels          = ['type']
+      metric_family   = GaugeMetricFamily
 
-      yield storj_sat_summary
-      yield storj_sat_audit
-      yield storj_sat_uptime
-      yield storj_sat_month_egress
-      yield storj_sat_month_ingress
-      yield storj_sat_day_egress
-      yield storj_sat_day_ingress
-      yield storj_sat_day_storage
-      yield storj_sat_nodeJoinedAt
+      metric_name     = 'storj_node'
+      data            = self.node_data
+      documentation   = 'Storj node info'
+      keys            = ['nodeID','wallet','lastPinged','upToDate','version','allowedVersion','startedAt']
+      yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, labels) 
+
+      metric_name     = 'storj_total_diskspace'
+      data            = self.node_data.get('diskSpace', None)
+      documentation   = 'Storj total diskspace metrics'
+      keys            = ['used','available','trash']
+      yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
+
+      data            = self.node_data.get('bandwidth', None)
+      metric_name     = 'storj_total_bandwidth'
+      documentation   = 'Storj total bandwidth metrics'
+      keys            = ['used','available']
+      yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
+
+      ## to be deprecated
+      for key in ['nodeID','wallet','lastPinged','upToDate','version','allowedVersion','startedAt']:
+        if key in self.node_data:
+          value = str(self.node_data[key])
+          metric = InfoMetricFamily('storj_' + key, 'Storj ' + key, value={key : value})
+          yield metric
+      ##############
+
+  def add_payout_metrics(self):
+    if 'payout' in self.storj_collectors:
+      self.get_node_payout_data()
+      metric_name     = 'storj_payout_currentMonth'
+      data            = self.node_data.get('payout', {}).get('currentMonth', None)
+      documentation   = 'Storj estimated payouts for current month'
+      keys            = ['egressBandwidth', 'egressBandwidthPayout', 'egressRepairAudit', 'egressRepairAuditPayout', 'diskSpace', 'diskSpacePayout', 'heldRate', 'payout', 'held']
+      labels          = ['type']
+      metric_family   = GaugeMetricFamily
+      yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
+
+  def add_sat_metrics(self):
+    if 'satellites' in self.node_data:
+      for sat in self.node_data['satellites']:
+        sat.update({'disqualified': 1}) if sat['disqualified'] else sat.update({'disqualified': 0})
+        sat.update({'suspended': 1}) if sat['suspended'] else sat.update({'suspended': 0})
+        metric_name     = 'storj_sat_summary'
+        data            = sat
+        documentation   = 'Storj satellite summary metrics'
+        keys            = ['disqualified','suspended']
+        labels          = ['type', 'satellite', 'url']
+        label_values    = [sat['id'], sat['url']]
+        metric_family   = GaugeMetricFamily
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+        yield from self.add_extended_sat_metrics(sat)    
+  
+  def add_extended_sat_metrics(self, sat):
+    if 'sat' in self.storj_collectors:
+      self.get_sat_data(sat)
+      labels          = ['type', 'satellite', 'url']
+      label_values    = [sat['id'], sat['url']]
+      metric_family   = GaugeMetricFamily
+
+      if 'sat_data' in sat:
+        metric_name     = 'storj_sat_nodeJoinedAt'
+        data            = sat['sat_data']
+        documentation   = 'Storj Node joined satellite at'
+        keys            = ['nodeJoinedAt']
+        yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, ['satellite', 'url'], label_values)
+
+        metric_name     = 'storj_sat_summary'
+        data            = sat['sat_data']
+        documentation   = 'Storj satellite summary metrics'
+        keys            = ['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_audit'
+        data            = sat['sat_data'].get('audit', None)
+        documentation   = 'Storj satellite audit metrics'
+        keys            = ['totalCount','successCount','alpha','beta','unknownAlpha','unknownBeta','score','unknownScore']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_uptime'
+        data            = sat['sat_data'].get('uptime', None)
+        documentation   = 'Storj satellite uptime metrics'
+        keys            = ['totalCount','successCount','alpha','beta','unknownAlpha','unknownBeta','score','unknownScore']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_day_egress'
+        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('egress', None)
+        documentation   = 'Storj satellite egress since current day start'
+        keys            = ['repair','audit','usage']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_day_ingress'
+        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('ingress', None)
+        documentation   = 'Storj satellite ingress since current day start'
+        keys            = ['repair','usage']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_day_storage'
+        data            = sat['sat_data'].get('storageDaily', [None])[-1]
+        documentation   = 'Storj satellite data stored on disk since current day start'
+        keys            = ['atRestTotal']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)        
+
+        metric_name     = 'storj_sat_month_egress'
+        data            = sat['sat_data'].get('sum_bandwidthDaily_egress', None)
+        documentation   = 'Storj satellite egress since current month start'
+        keys            = ['repair','audit','usage']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
+
+        metric_name     = 'storj_sat_month_ingress'
+        data            = sat['sat_data'].get('sum_bandwidthDaily_ingress', None)
+        documentation   = 'Storj satellite ingress since current month start'
+        keys            = ['repair','usage']
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
   def collect(self):
-    self.get_data()
     yield from self.add_node_metrics()
-    self.get_payout()
-    yield from self.add_payout_metrics()  
-    self.get_satellites()
-    yield from self.add_sat_metrics()
+    if self.node_data:
+      yield from self.add_payout_metrics()
+      yield from self.add_sat_metrics()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
   REGISTRY.register(StorjCollector())
   start_http_server(int(storj_exporter_port))
