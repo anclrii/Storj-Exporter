@@ -10,7 +10,7 @@ Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/
 Tested with storage node version `1.16.1`
 
 ## Support
-<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=120 width=160 align="right"/> 
+<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=100 width=100 align="right"/> 
 
 Feel free to raise issues if you find any and also raise a PR if you'd like to contribute.
 
