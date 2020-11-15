@@ -64,10 +64,14 @@ Clone this repo and cd, then
     systemctl enable storj_exporter
 
 ## Variables
-Environment variables are available to manage storage node hostname and ports. Defaults are different for Docker/Standalone, mainly 127.0.0.1 is a default api host for standalone.
+Environment variables are available to manage storage node hostname and ports. Defaults are different for Docker and Standalone installations, 127.0.0.1 is a default api host for standalone installation.
 
-| Variable name | Docker default | Standalone default |
-| --- | --- | --- |
-| STORJ_HOST_ADDRESS | storagenode | 127.0.0.1 |
-| STORJ_API_PORT | 14002 | 14002 |
-| STORJ_EXPORTER_PORT | 9651 | 9651 |
+| Variable name | Description | Docker default | Standalone default |
+| --- | --- | --- | --- |
+| STORJ_HOST_ADDRESS | Address of the storage node | storagenode | 127.0.0.1 |
+| STORJ_API_PORT | Storage node api port | 14002 | 14002 |
+| STORJ_EXPORTER_PORT | A port that exporter opens to expose metrics on | 9651 | 9651 |
+| STORJ_COLLECTORS | A list of collectors | payout sat | payout sat |
+
+### Collectors
+By default exporter collects node, payout and satellite data from api. Satellite data is particularly expensive on cpu resources and disabling it might be useful on smaller systems
