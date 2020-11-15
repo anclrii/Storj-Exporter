@@ -2,13 +2,23 @@
 ---
 
 Storj exporter for prometheus written in python.
-This exporter pulls information from storj storage node api for `dashboard` and `satellite` metrics.
+This exporter pulls information from storj node api for `node`, `satellite` and `payout` metrics.
 
 Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple Storj storage nodes.
 
 ![combined dashboard](https://github.com/anclrii/Storj-Exporter-Dashboard/raw/master/combined%20dashboard.png)
 
-Tested with storj storage node version `v0.22.1`
+Tested with storage node version `1.16.1`
+
+## Support
+<img src="https://avatars2.githubusercontent.com/u/40526988?s=120&v=4" alt="Markdown Monster icon" width=150 hight=150 align="right"/> 
+
+Feel free to raise issues if you find any and also raise a PR if you'd like to contribute.
+
+If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
+
+### `0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
+<br clear="right"/>
 
 ## Usage
 
@@ -63,10 +73,3 @@ Environment variables are available to manage storage node hostname and ports. D
 | STORJ_HOST_ADDRESS | storagenode | 127.0.0.1 |
 | STORJ_API_PORT | 14002 | 14002 |
 | STORJ_EXPORTER_PORT | 9651 | 9651 |
-
-## Support
-Feel free to raise issues if you find any (currently needs more work) and also raise PR if you'd like to contribute.
-
-You can also buy me a coffee with some Ether/Storj if you find this useful:
-
-### `0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
