@@ -1,5 +1,4 @@
 # Storj Exporter
----
 
 Storj exporter for prometheus written in python.
 This exporter pulls information from storj node api for `node`, `satellite` and `payout` metrics.
@@ -11,7 +10,7 @@ Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/
 Tested with storage node version `1.16.1`
 
 ## Support
-<img src="https://avatars2.githubusercontent.com/u/40526988?s=120&v=4" alt="Markdown Monster icon" width=150 hight=150 align="right"/> 
+<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" align="right"/> 
 
 Feel free to raise issues if you find any and also raise a PR if you'd like to contribute.
 
