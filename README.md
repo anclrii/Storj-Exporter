@@ -10,14 +10,13 @@ Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/
 Tested with storage node version `1.16.1`
 
 ## Support
-<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" align="right"/> 
+<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=120 width=160 align="right"/> 
 
 Feel free to raise issues if you find any and also raise a PR if you'd like to contribute.
 
 If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
 
-### `0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
-<br clear="right"/>
+`0x187C8C43890fe4C91aFabbC62128D383A90548Dd` <br clear="right"/>
 
 ## Usage
 
