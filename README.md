@@ -1,18 +1,17 @@
 # Storj Exporter
 
-Storj exporter for prometheus written in python.
-This exporter pulls information from storj node api for `node`, `satellite` and `payout` metrics.
+Storj exporter for prometheus written in python. It pulls information from storj node api for `node`, `satellite` and `payout` metrics.
 
-Can be used together with [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple Storj storage nodes.
+Also check out [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple storj nodes.
 
 ![combined dashboard](https://github.com/anclrii/Storj-Exporter-Dashboard/raw/master/combined%20dashboard.png)
 
-Tested with storage node version `1.16.1`
+Tested with storj node version `1.16.1`
 
 ## Support
 <img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=100 width=100 align="right"/> 
 
-Feel free to raise issues if you find any and also raise a PR if you'd like to contribute.
+Feel free to raise issues if you find them and also raise a PR if you'd like to contribute.
 
 If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
 
@@ -20,12 +19,12 @@ If you wish to support my work :coffee:, please find my eth wallet address below
 
 ## Usage
 
-* Exporter can be run as standalone script or docker container
-* Make sure you have `-p 127.0.0.1:14002:14002` in storagenode container docker run command
-* `--link=storagenode` is the name of the storage node container used to link exporter to it's network dynamically
+* Exporter can be run as a docker container or a systemd service or a standalone script
+* Make sure you have `-p 127.0.0.1:14002:14002` in storagenode container docker run command to allow local connections to storj node api
+* `--link=storagenode` is the name of the storage node container used to link exporter to it's network dynamically, use your storj node container name if it differs
 
 ### Docker
-#### Run latest from DockerHub (easiest option, works out of the box provided above is set)
+#### Run latest build from DockerHub (easiest option, works out of the box provided above is set)
 
     docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 anclrii/storj-exporter:latest
     
@@ -35,11 +34,9 @@ Clone this repo and cd, then
     docker build -t storj-exporter .
     docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 storj-exporter
 
-### Standalone script
+---
 
-    python3 storj-exporter.py
-   
-### Linux Installation
+### Systemd service
 
 #### Create storj-exporter user for service
 
@@ -63,8 +60,16 @@ Clone this repo and cd, then
     systemctl restart storj_exporter
     systemctl enable storj_exporter
 
+---
+
+### Standalone script
+
+    python3 storj-exporter.py
+
+---
+
 ## Variables
-Environment variables are available to manage storage node hostname and ports. Defaults are different for Docker and Standalone installations, 127.0.0.1 is a default api host for standalone installation.
+Following environment variables are available:
 
 | Variable name | Description | Docker default | Standalone default |
 | --- | --- | --- | --- |
