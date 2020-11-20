@@ -2,11 +2,11 @@
 
 Storj exporter for prometheus written in python. It pulls information from storj node api for `node`, `satellite` and `payout` metrics.
 
-<img src="https://github.com/anclrii/Storj-Exporter-dashboard/raw/master/storj-exporter-boom-table.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=500 width=500 align="right"/> 
-
 Also check out [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple storj nodes.
 
 Tested with storj node version `1.16.1`
+
+<img src="https://github.com/anclrii/Storj-Exporter-dashboard/raw/master/storj-exporter-boom-table.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=500 width=500 align="right"/> 
 
 ## Support
 <img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=100 width=100 align="right"/> 
@@ -15,7 +15,7 @@ Feel free to raise issues if you find them and also raise a PR if you'd like to 
 
 If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
 
-`0x187C8C43890fe4C91aFabbC62128D383A90548Dd` <br clear="right"/>
+`0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
 
 ## Usage
 
