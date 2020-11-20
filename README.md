@@ -19,16 +19,17 @@ If you wish to support my work :coffee:, please find my eth wallet address below
 
 ## Usage
 
-* Exporter can be run as a docker container or a systemd service or a standalone script
+* Exporter can be installed as a docker container or a systemd service or a standalone script
 * Make sure you have `-p 127.0.0.1:14002:14002` in storagenode container docker run command to allow local connections to storj node api
 * `--link=storagenode` is the name of the storage node container used to link exporter to it's network dynamically, use your storj node container name if it differs
 
-### Docker
-#### Run latest build from DockerHub (easiest option, works out of the box provided above is set)
+### Installation
+#### Docker installation
+##### Run latest build from DockerHub (easiest option, works out of the box provided above is set)
 
     docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 anclrii/storj-exporter:latest
     
-#### OR build your own
+##### OR build your own
 Clone this repo and cd, then
 
     docker build -t storj-exporter .
@@ -36,24 +37,24 @@ Clone this repo and cd, then
 
 ---
 
-### Systemd service
+#### Systemd service installation
 
-#### Create storj-exporter user for service
+##### Create storj-exporter user for service
 
     useradd --no-create-home --shell /bin/false storj_exporter
 
-#### Install package dependencies
+##### Install package dependencies
 
     Dependencies: python3 python3-pip
     pip3 install prometheus_client
     
-#### Move storj_exporter to binary directory
+##### Move storj_exporter to binary directory
 
     mv Storj-Exporter/storj-exporter.py /usr/local/bin/
     chown storj_exporter:storj_exporter /usr/local/bin/storj-exporter.py
     chmod +x /usr/local/bin/storj-exporter.py
    
-#### Install systemd service and set to start on boot
+##### Install systemd service and set to start on boot
     
     cp storj_exporter.service /etc/systemd/system/
     systemctl daemon-reload
@@ -62,7 +63,7 @@ Clone this repo and cd, then
 
 ---
 
-### Standalone script
+#### Standalone script installation
 
     python3 storj-exporter.py
 
