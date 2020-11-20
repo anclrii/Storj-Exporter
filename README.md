@@ -15,6 +15,7 @@ Feel free to raise issues if you find them and also raise a PR if you'd like to 
 
 If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
 
+
 `0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
 
 ## Usage
@@ -63,7 +64,7 @@ Clone this repo and cd, then
 
 ---
 
-#### Standalone script installation
+#### Standalone script
 
     python3 storj-exporter.py
 
