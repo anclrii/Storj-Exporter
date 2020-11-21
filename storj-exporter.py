@@ -60,6 +60,12 @@ class StorjCollector(object):
           metric.add_metric(key_label_values, value)      
       yield metric
 
+  def safe_list_get(self, list, idx):
+    try:
+      return list[idx]
+    except:
+      return None
+
   def add_node_metrics(self):
     self.get_node_data()
     if self.node_data:
@@ -151,19 +157,19 @@ class StorjCollector(object):
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_egress'
-        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('egress', None)
+        data            = self.safe_list_get(sat['sat_data'].get('bandwidthDaily', [{}]), -1).get('egress', None)
         documentation   = 'Storj satellite egress since current day start'
         keys            = ['repair','audit','usage']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_ingress'
-        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('ingress', None)
+        data            = self.safe_list_get(sat['sat_data'].get('bandwidthDaily', [{}]), -1).get('ingress', None)
         documentation   = 'Storj satellite ingress since current day start'
         keys            = ['repair','usage']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_storage'
-        data            = sat['sat_data'].get('storageDaily', [None])[-1]
+        data            = self.safe_list_get(sat['sat_data'].get('storageDaily', None),-1)
         documentation   = 'Storj satellite data stored on disk since current day start'
         keys            = ['atRestTotal']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)        
