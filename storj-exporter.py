@@ -2,7 +2,10 @@ import os
 import time
 import requests
 import json
-from prometheus_client import start_http_server
+import threading
+from wsgiref.simple_server import make_server
+from prometheus_client import MetricsHandler, make_wsgi_app
+from prometheus_client.exposition import ThreadingWSGIServer
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
 class StorjCollector(object):
@@ -192,8 +195,35 @@ class StorjCollector(object):
       yield from self.add_payout_metrics()
       yield from self.add_sat_metrics()
 
+
+class HTTPRequestHandler(MetricsHandler):
+  def do_GET(self):
+
+    if self.path == "/metrics":
+      return MetricsHandler.do_GET(self)
+
+    elif self.path == "/status":
+      message = dict(status="alive")
+      self.send_response(200)
+      self.end_headers()
+      self.wfile.write(bytes(json.dumps(message), "utf-8"))
+
+    else:
+      self.send_error(404)
+
+  def log_message(self, format, *args):
+    """Log nothing."""
+
+def start_wsgi_server(port, addr='', registry=REGISTRY):
+  """Starts a WSGI server for prometheus metrics as a daemon thread."""
+  app = make_wsgi_app(registry)
+  httpd = make_server(addr, port, app, ThreadingWSGIServer, handler_class=HTTPRequestHandler)
+  t = threading.Thread(target=httpd.serve_forever)
+  t.daemon = True
+  t.start()
+
 if __name__ == '__main__':
-  storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
+  storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
   REGISTRY.register(StorjCollector())
-  start_http_server(int(storj_exporter_port))
+  start_wsgi_server(storj_exporter_port,'')
   while True: time.sleep(1)
