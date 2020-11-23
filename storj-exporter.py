@@ -199,17 +199,15 @@ class StorjCollector(object):
 class HTTPRequestHandler(MetricsHandler):
   def do_GET(self):
 
-    if self.path == "/metrics":
-      return MetricsHandler.do_GET(self)
-
-    elif self.path == "/status":
+    if self.path == "/status":
       message = dict(status="alive")
       self.send_response(200)
       self.end_headers()
       self.wfile.write(bytes(json.dumps(message), "utf-8"))
 
     else:
-      self.send_error(404)
+      return MetricsHandler.do_GET(self)
+      #self.send_error(404)
 
   def log_message(self, format, *args):
     """Log nothing."""
