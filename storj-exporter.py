@@ -38,7 +38,7 @@ class StorjCollector(object):
           
   def sum_sat_daily_keys(self, daily_data_dict, daily_data_key, data_types, daily_data_path):
     sum_month_dict = daily_data_dict['sum_' + daily_data_key + '_' + daily_data_path ] = {}
-    if daily_data_key in daily_data_dict:
+    if daily_data_key in daily_data_dict and isinstance(daily_data_dict[daily_data_key], list):
       for day in daily_data_dict[daily_data_key]:
         for data_type in data_types:
           if data_type not in sum_month_dict:
@@ -63,11 +63,11 @@ class StorjCollector(object):
           metric.add_metric(key_label_values, value)      
       yield metric
 
-  def safe_list_get(self, list, idx):
+  def safe_list_get(self, list, idx, default={}):
     try:
       return list[idx]
     except:
-      return None
+      return default
 
   def add_node_metrics(self):
     self.get_node_data()
