@@ -2,7 +2,10 @@ import os
 import time
 import requests
 import json
-from prometheus_client import start_http_server
+import threading
+from wsgiref.simple_server import make_server
+from prometheus_client import MetricsHandler, make_wsgi_app
+from prometheus_client.exposition import ThreadingWSGIServer
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
 
 class StorjCollector(object):
@@ -35,7 +38,7 @@ class StorjCollector(object):
           
   def sum_sat_daily_keys(self, daily_data_dict, daily_data_key, data_types, daily_data_path):
     sum_month_dict = daily_data_dict['sum_' + daily_data_key + '_' + daily_data_path ] = {}
-    if daily_data_key in daily_data_dict:
+    if daily_data_key in daily_data_dict and isinstance(daily_data_dict[daily_data_key], list):
       for day in daily_data_dict[daily_data_key]:
         for data_type in data_types:
           if data_type not in sum_month_dict:
@@ -59,6 +62,12 @@ class StorjCollector(object):
             value = dict[key]
           metric.add_metric(key_label_values, value)      
       yield metric
+
+  def safe_list_get(self, list, idx, default={}):
+    try:
+      return list[idx]
+    except:
+      return default
 
   def add_node_metrics(self):
     self.get_node_data()
@@ -151,19 +160,19 @@ class StorjCollector(object):
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_egress'
-        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('egress', None)
+        data            = self.safe_list_get(sat['sat_data'].get('bandwidthDaily', [{}]), -1).get('egress', None)
         documentation   = 'Storj satellite egress since current day start'
         keys            = ['repair','audit','usage']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_ingress'
-        data            = sat['sat_data'].get('bandwidthDaily', [{}])[-1].get('ingress', None)
+        data            = self.safe_list_get(sat['sat_data'].get('bandwidthDaily', [{}]), -1).get('ingress', None)
         documentation   = 'Storj satellite ingress since current day start'
         keys            = ['repair','usage']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_storage'
-        data            = sat['sat_data'].get('storageDaily', [None])[-1]
+        data            = self.safe_list_get(sat['sat_data'].get('storageDaily', None),-1)
         documentation   = 'Storj satellite data stored on disk since current day start'
         keys            = ['atRestTotal']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)        
@@ -186,8 +195,33 @@ class StorjCollector(object):
       yield from self.add_payout_metrics()
       yield from self.add_sat_metrics()
 
+
+class HTTPRequestHandler(MetricsHandler):
+  def do_GET(self):
+
+    if self.path == "/status":
+      message = dict(status="alive")
+      self.send_response(200)
+      self.end_headers()
+      self.wfile.write(bytes(json.dumps(message), "utf-8"))
+
+    else:
+      return MetricsHandler.do_GET(self)
+      #self.send_error(404)
+
+  def log_message(self, format, *args):
+    """Log nothing."""
+
+def start_wsgi_server(port, addr='', registry=REGISTRY):
+  """Starts a WSGI server for prometheus metrics as a daemon thread."""
+  app = make_wsgi_app(registry)
+  httpd = make_server(addr, port, app, ThreadingWSGIServer, handler_class=HTTPRequestHandler)
+  t = threading.Thread(target=httpd.serve_forever)
+  t.daemon = True
+  t.start()
+
 if __name__ == '__main__':
-  storj_exporter_port = os.environ.get('STORJ_EXPORTER_PORT', '9651')
+  storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
   REGISTRY.register(StorjCollector())
-  start_http_server(int(storj_exporter_port))
+  start_wsgi_server(storj_exporter_port,'')
   while True: time.sleep(1)
