@@ -98,3 +98,7 @@ modules:
 #  powerdns_recursor: yes
   prometheus: no
 ```
+After that restart the netdata service:
+```
+sudo systemctl restart netdata
+```
