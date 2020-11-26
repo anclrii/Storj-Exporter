@@ -82,3 +82,19 @@ Following environment variables are available:
 
 ### Collectors
 By default exporter collects node, payout and satellite data from api. Satellite data is particularly expensive on cpu resources and disabling it might be useful on smaller systems
+
+### Netdata
+For users that use Netdata:
+Netdata by default has a prometheus plugin enabled, which pulls all the data from the exporter every 5 seconds. This results in high CPU spikes on the storagenode. It is therefore advisable to disable the prometheus plugin of Netdata:
+```
+cd /etc/netdata
+sudo ./edit-config go.d.conf
+```
+Then under "modules:" uncomment "prometheus" and change its value to "no":
+```
+modules:
+#  activemq: yes
+[...]
+#  powerdns_recursor: yes
+  prometheus: no
+```
