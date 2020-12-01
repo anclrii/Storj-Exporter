@@ -1,4 +1,5 @@
 import os
+import signal
 import time
 import requests
 import json
@@ -212,6 +213,21 @@ class HTTPRequestHandler(MetricsHandler):
   def log_message(self, format, *args):
     """Log nothing."""
 
+class GracefulKiller:
+  kill_now = False
+  signals = {
+    signal.SIGINT: 'SIGINT',
+    signal.SIGTERM: 'SIGTERM'
+  }
+
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+  def exit_gracefully(self, signum, frame):
+    print("\nReceived {} signal, exiting ...".format(self.signals[signum]))
+    self.kill_now = True
+
 def start_wsgi_server(port, addr='', registry=REGISTRY):
   """Starts a WSGI server for prometheus metrics as a daemon thread."""
   app = make_wsgi_app(registry)
@@ -221,7 +237,8 @@ def start_wsgi_server(port, addr='', registry=REGISTRY):
   t.start()
 
 if __name__ == '__main__':
-  storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
+  killer = GracefulKiller()
   REGISTRY.register(StorjCollector())
+  storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
   start_wsgi_server(storj_exporter_port,'')
-  while True: time.sleep(1)
+  while not killer.kill_now: time.sleep(1)
