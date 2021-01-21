@@ -29,7 +29,9 @@ If you wish to support my work :coffee:, please find my eth wallet address below
 ##### Run latest build from DockerHub (easiest option, works out of the box provided above is set)
 
     docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 anclrii/storj-exporter:latest
-    
+
+Docker image supports `linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64` platforms.
+
 ##### OR build your own
 Clone this repo and cd, then
 
@@ -62,11 +64,15 @@ Clone this repo and cd, then
     systemctl restart storj_exporter
     systemctl enable storj_exporter
 
----
-
-#### Standalone script
+##### Standalone script
 
     python3 storj-exporter.py
+
+---
+
+##### Installing full monitoring stack (Prometheus + Grafana + Dashboard)
+
+You can find some installation notes and guides in [dashboard README](https://github.com/anclrii/Storj-Exporter-dashboard#installing-full-monitoring-stack), also see [quick-start guide](https://github.com/anclrii/Storj-Exporter-dashboard/tree/master/quick_start) to set up the whole stack using docker-compose.
 
 ---
 
