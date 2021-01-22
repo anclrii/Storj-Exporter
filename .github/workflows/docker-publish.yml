@@ -3,9 +3,6 @@ name: Build
 on:
   push:
 
-env:
-  DOCKER_REPO: anclrii/storj-exporter
-  
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -46,6 +43,6 @@ jobs:
           platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
           push: true
           tags: |
-            ${{ github.ref == 'refs/heads/master' && '$DOCKER_REPO:latest' || '' }}
-            ${{ env.DOCKER_REPO }}:${{ steps.bumpVersion.outputs.new_tag }}
+            ${{ github.ref == 'refs/heads/master' && 'anclrii/storj-exporter:latest' || '' }}
+            anclrii/storj-exporter:${{ steps.bumpVersion.outputs.new_tag }}
           labels: ${{ steps.docker_meta.outputs.labels }}
