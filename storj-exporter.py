@@ -140,7 +140,7 @@ class StorjCollector(object):
         data            = sat['sat_data']
         documentation   = 'Storj Node joined satellite at'
         keys            = ['nodeJoinedAt']
-        yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, ['satellite', 'url'], label_values)
+        yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, labels, label_values)
 
         metric_name     = 'storj_sat_summary'
         data            = sat['sat_data']
