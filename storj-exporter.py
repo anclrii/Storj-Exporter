@@ -145,7 +145,7 @@ class StorjCollector(object):
         metric_name     = 'storj_sat_summary'
         data            = sat['sat_data']
         documentation   = 'Storj satellite summary metrics'
-        keys            = ['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore']
+        keys            = ['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore', 'currentStorageUsed']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_audit'
