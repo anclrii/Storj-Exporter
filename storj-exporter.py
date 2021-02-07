@@ -140,24 +140,18 @@ class StorjCollector(object):
         data            = sat['sat_data']
         documentation   = 'Storj Node joined satellite at'
         keys            = ['nodeJoinedAt']
-        yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, ['satellite', 'url'], label_values)
+        yield from self.dict_to_metric(data, metric_name, documentation, InfoMetricFamily, keys, labels, label_values)
 
         metric_name     = 'storj_sat_summary'
         data            = sat['sat_data']
         documentation   = 'Storj satellite summary metrics'
-        keys            = ['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore']
+        keys            = ['storageSummary','bandwidthSummary','egressSummary','ingressSummary','onlineScore', 'currentStorageUsed']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_audit'
-        data            = sat['sat_data'].get('audit', None)
+        data            = sat['sat_data'].get('audits', None)
         documentation   = 'Storj satellite audit metrics'
-        keys            = ['totalCount','successCount','alpha','beta','unknownAlpha','unknownBeta','score','unknownScore']
-        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
-
-        metric_name     = 'storj_sat_uptime'
-        data            = sat['sat_data'].get('uptime', None)
-        documentation   = 'Storj satellite uptime metrics'
-        keys            = ['totalCount','successCount','alpha','beta','unknownAlpha','unknownBeta','score','unknownScore']
+        keys            = ['auditScore','suspensionScore','onlineScore','satelliteName']
         yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels, label_values)
 
         metric_name     = 'storj_sat_day_egress'

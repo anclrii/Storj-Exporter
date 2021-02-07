@@ -25,21 +25,24 @@ If you wish to support my work :coffee:, please find my eth wallet address below
 
 * Exporter can be installed as a docker container or a systemd service or a standalone script
 * Make sure you have `-p 127.0.0.1:14002:14002` in storagenode container docker run command to allow local connections to storj node api
-* `--link=storagenode` is the name of the storage node container used to link exporter to it's network dynamically, use your storj node container name if it differs
+* `storagenode` is the default value for `STORJ_HOST_ADDRESS` environment variable that sets the address of the storage node container used to link exporter to the api
+* If you storagenode container has a different name it needs to be set with both `--link=<storagenode-name-here>` and `-e STORJ_HOST_ADDRESS=<storagenode-name-here>` on the docker command
 
 ### Installation
 #### Docker installation
-##### Run latest build from DockerHub (easiest option, works out of the box provided above is set)
+##### Run latest build from DockerHub (easiest option, assuming `storagenode` is the name of the storagenode container)
 
-    docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 anclrii/storj-exporter:latest
+    docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 -e STORJ_HOST_ADDRESS=storagenode anclrii/storj-exporter:latest
 
 Docker image supports `linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64` platforms.
 
-##### OR build your own
-Clone this repo and cd, then
+##### Run multiple instances of exporter to monitor multiple storagenodes running on the same host
 
-    docker build -t storj-exporter .
-    docker run -d --link=storagenode --name=storj-exporter -p 9651:9651 storj-exporter
+In this example `storagenode1, storagenode2, storagenode3` are the names of storagenode containers runnin on the same host. The docker commands would be:
+
+    docker run -d --link=storagenode1 --name=storj-exporter1 -p 9651:9651 -e STORJ_HOST_ADDRESS=storagenode1 anclrii/storj-exporter:latest
+    docker run -d --link=storagenode2 --name=storj-exporter2 -p 9652:9651 -e STORJ_HOST_ADDRESS=storagenode2 anclrii/storj-exporter:latest
+    docker run -d --link=storagenode3 --name=storj-exporter3 -p 9653:9651 -e STORJ_HOST_ADDRESS=storagenode3 anclrii/storj-exporter:latest
 
 #### Systemd service installation
 
