@@ -44,5 +44,6 @@ jobs:
           push: true
           tags: |
             ${{ github.ref == 'refs/heads/master' && 'anclrii/storj-exporter:latest' || '' }}
+            ${{ github.ref == 'refs/heads/dev' && 'anclrii/storj-exporter:dev' || '' }}
             anclrii/storj-exporter:${{ steps.bumpVersion.outputs.new_tag }}
           labels: ${{ steps.docker_meta.outputs.labels }}
