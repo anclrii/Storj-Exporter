@@ -1,6 +1,6 @@
 ![Build](https://github.com/anclrii/Storj-Exporter/workflows/Build/badge.svg)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/anclrii/Storj-exporter)
-
+![GitHub Sponsors](https://img.shields.io/github/sponsors/anclrii)
 ## About
 
 Storj exporter for Prometheus written in python. It pulls information from storj node api for `node`, `satellite` and `payout` metrics.
@@ -10,16 +10,6 @@ Also check out [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Expor
 Tested with storj node version `1.19.6`
 
 <img src="https://github.com/anclrii/Storj-Exporter-dashboard/raw/master/storj-exporter-boom-table.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=490 width=490 align="right"/> 
-
-## Support
-Feel free to raise issues if you find them and also raise a PR if you'd like to contribute.
-
-<img src="qr.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=100 width=100 align="right"/> 
-
-If you wish to support my work :coffee:, please find my eth wallet address below or scan the qr code:
-
-
-`0x187C8C43890fe4C91aFabbC62128D383A90548Dd`
 
 ## Usage
 
