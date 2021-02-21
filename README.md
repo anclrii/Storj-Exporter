@@ -1,6 +1,6 @@
 ![Build](https://github.com/anclrii/Storj-Exporter/workflows/Build/badge.svg)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/anclrii/Storj-exporter)
-
+![GitHub Sponsors](https://img.shields.io/github/sponsors/anclrii)
 ## About
 
 Storj exporter for Prometheus written in python. It pulls information from storj node api for `node`, `satellite` and `payout` metrics.
