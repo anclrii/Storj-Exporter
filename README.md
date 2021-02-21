@@ -11,9 +11,6 @@ Tested with storj node version `1.19.6`
 
 <img src="https://github.com/anclrii/Storj-Exporter-dashboard/raw/master/storj-exporter-boom-table.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=490 width=490 align="right"/> 
 
-## Support
-Feel free to raise issues if you find them and also raise a PR if you'd like to contribute.
-
 ## Usage
 
 * Exporter can be installed as a docker container or a systemd service or a standalone script
