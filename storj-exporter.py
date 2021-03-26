@@ -105,13 +105,14 @@ class StorjCollector(object):
   def add_payout_metrics(self):
     if 'payout' in self.storj_collectors:
       self.get_node_payout_data()
-      metric_name     = 'storj_payout_currentMonth'
-      data            = self.node_data.get('payout', {}).get('currentMonth', None)
-      documentation   = 'Storj estimated payouts for current month'
-      keys            = ['egressBandwidth', 'egressBandwidthPayout', 'egressRepairAudit', 'egressRepairAuditPayout', 'diskSpace', 'diskSpacePayout', 'heldRate', 'payout', 'held']
-      labels          = ['type']
-      metric_family   = GaugeMetricFamily
-      yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
+      if self.node_data.get('payout', {}):
+        metric_name     = 'storj_payout_currentMonth'
+        data            = self.node_data.get('payout', {}).get('currentMonth', None)
+        documentation   = 'Storj estimated payouts for current month'
+        keys            = ['egressBandwidth', 'egressBandwidthPayout', 'egressRepairAudit', 'egressRepairAuditPayout', 'diskSpace', 'diskSpacePayout', 'heldRate', 'payout', 'held']
+        labels          = ['type']
+        metric_family   = GaugeMetricFamily
+        yield from self.dict_to_metric(data, metric_name, documentation, metric_family, keys, labels)
 
   def add_sat_metrics(self):
     if 'satellites' in self.node_data:
