@@ -8,7 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run tests
+      - name: Install pip requirements
+        run: pip install --no-cache-dir -r requirements.txt
+      - name: Run flake8 lint
+        run: flake8
+      - name: Run unit tests
+        run: pytest -v tests/
+      - name: Test docker build
         run: docker build . --file Dockerfile
   push:
     needs: test
