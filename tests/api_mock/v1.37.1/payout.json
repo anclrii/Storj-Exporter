@@ -1,0 +1,25 @@
+{
+  "currentMonth": {
+    "egressBandwidth": 82429993216,
+    "egressBandwidthPayout": 164.85000000000002,
+    "egressRepairAudit": 216061878016,
+    "egressRepairAuditPayout": 216.06,
+    "diskSpace": 3313463435649.0586,
+    "diskSpacePayout": 497.02,
+    "heldRate": 0,
+    "payout": 877.2199999999999,
+    "held": 0.71
+  },
+  "previousMonth": {
+    "egressBandwidth": 143930926336,
+    "egressBandwidthPayout": 287.85999999999996,
+    "egressRepairAudit": 250566307328,
+    "egressRepairAuditPayout": 250.57,
+    "diskSpace": 3598207279200.8174,
+    "diskSpacePayout": 539.73,
+    "heldRate": 0,
+    "payout": 1077.31,
+    "held": 0.855
+  },
+  "currentMonthExpectations": 938
+}

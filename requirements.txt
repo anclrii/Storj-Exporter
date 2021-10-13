@@ -1,2 +1,5 @@
 requests
+requests-mock
 prometheus_client
+pytest
+flake8
