@@ -1,0 +1,98 @@
+#import storj_exporter
+
+from api_wrapper import ApiClient
+from collectors import NodeCollector#, SatCollector
+
+
+
+from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily, REGISTRY
+import os
+import signal
+import time
+import requests
+import json
+import threading
+from wsgiref.simple_server import make_server
+from prometheus_client import MetricsHandler, make_wsgi_app
+from prometheus_client.exposition import ThreadingWSGIServer
+from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, REGISTRY
+
+
+class CustomCollector(object):
+    def collect(self):
+        yield GaugeMetricFamily('my_gauge', 'Help text', value=7)
+        c = CounterMetricFamily('my_counter_total', 'Help text', labels=['foo'])
+        c.add_metric(['bat'], 1.7)
+        c.add_metric(['baf'], 3.8)
+        yield c
+
+class CustomCollector2(object):
+    def collect(self):
+        yield GaugeMetricFamily('my_gauge2', 'Help text', value=227)
+        c = CounterMetricFamily('my_counter_total2', 'Help text', labels=['foddo'])
+        c.add_metric(['bar'], 9.7)
+        c.add_metric(['baz'], 9.8)
+        yield c
+
+class HTTPRequestHandler(MetricsHandler):
+  def do_GET(self):
+
+    if self.path == "/status":
+      message = dict(status="alive")
+      self.send_response(200)
+      self.end_headers()
+      self.wfile.write(bytes(json.dumps(message), "utf-8"))
+
+    else:
+      return MetricsHandler.do_GET(self)
+      #self.send_error(404)
+
+  def log_message(self, format, *args):
+    """Log nothing."""
+
+class GracefulKiller:
+  kill_now = False
+  signals = {
+    signal.SIGINT: 'SIGINT',
+    signal.SIGTERM: 'SIGTERM'
+  }
+
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+  def exit_gracefully(self, signum, frame):
+    print("\nReceived {} signal, exiting ...".format(self.signals[signum]))
+    self.kill_now = True
+
+def start_wsgi_server(port, addr='', registry=REGISTRY):
+  """Starts a WSGI server for prometheus metrics as a daemon thread."""
+  app = make_wsgi_app(registry)
+  httpd = make_server(addr, port, app, ThreadingWSGIServer, handler_class=HTTPRequestHandler)
+  t = threading.Thread(target=httpd.serve_forever)
+  t.daemon = True
+  t.start()
+
+def print_samples(registry):
+    for metric in registry.collect():
+        for s in metric.samples:
+            print(s)
+
+def main():  
+  # killer = GracefulKiller()
+  client = ApiClient('http://localhost:14007/api/') # todo - parametrize
+  node_collector = NodeCollector(client)
+  #sat_collector = SatCollector(client)
+  REGISTRY.register(node_collector)
+  print_samples(REGISTRY)
+  from prometheus_client import exposition
+
+  print(exposition.generate_latest(REGISTRY))
+  # REGISTRY.register(CustomCollector())
+  # REGISTRY.register(CustomCollector2())
+  # storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
+  # start_wsgi_server(storj_exporter_port,'')
+  # while not killer.kill_now: time.sleep(1)
+
+if __name__ == '__main__':
+  main()
