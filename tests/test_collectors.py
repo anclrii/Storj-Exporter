@@ -1,6 +1,7 @@
 import pytest
-from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily
-from storj_exporter.collectors import StorjCollector
+from typing import Generator
+
+from storj_exporter.collectors import NodeCollector, StorjCollector
 
 @pytest.fixture(name="list_of_dicts")
 def fixture_mock_get_satellite():
@@ -10,53 +11,60 @@ def fixture_mock_get_satellite():
         {'egress': {'repair': 1, 'audit': 2, 'usage': 3}, 'key': 4},
     ]
 
-@pytest.fixture(name="node_metric_map")
-def fixture_gen_node_metric_map(self):
-    _metricMap = {
-        'storj_node': {
-            'metric_object': InfoMetricFamily(
-                name='storj_node',
-                documentation='Storj node info',
-                labels=['type']
-            ),
-            'extra_labels': [],
-            'dict_keys': ['nodeID', 'wallet', 'lastPinged', 'upToDate', 'version',
-                          'allowedVersion', 'startedAt'],
-            'dict': self._node(),
-        },
-        'storj_total_diskspace': {
-            'metric_object': GaugeMetricFamily(
-                name='storj_total_diskspace',
-                documentation='Storj total diskspace metrics',
-                labels=['type']
-            ),
-            'extra_labels': [],
-            'dict_keys': ['used', 'available', 'trash'],
-            'dict': self._node()['diskSpace'],
-        },
-        'storj_total_bandwidth': {
-            'metric_object': GaugeMetricFamily(
-                name='storj_total_bandwidth',
-                documentation='Storj total bandwidth metrics',
-                labels=['type']
-            ),
-            'extra_labels': [],
-            'dict_keys': ['used', 'available'],
-            'dict': self._node()['bandwidth'],
-        },
-    }
-    return _metricMap
+@pytest.fixture(name="gauge_dict")
+def fixture_gauge_dict():
+    return {'used': 3498284766336, 'available': 3500000000000, 'trash': 1222393984,
+            'overused': 0}
 
 class TestStorjCollector:
-    def test_collect_metric_map(self):
-        assert True
+    @pytest.mark.usefixtures("mock_get_sno")
+    def test_collect_metric_map(self, client):
+        node_metric_map = NodeCollector(client)._gen_node_metric_map()
+        result = StorjCollector(client)._collect_metric_map(node_metric_map)
+        res_list = list(result)
+        assert isinstance(result, Generator)
+        assert len(res_list) == 3
 
-    def test_sum_list_of_dicts_by_key(self, list_of_dicts):
-        sum_dict = StorjCollector._sum_list_of_dicts_by_key(list_of_dicts, 'egress')
+    def test_collect_metric_map_api_fail(self, client):
+        node_metric_map = NodeCollector(client)._gen_node_metric_map()
+        result = StorjCollector(client)._collect_metric_map(node_metric_map)
+        res_list = list(result)
+        assert isinstance(result, Generator)
+        assert res_list == [None, None, None]
+
+    @pytest.mark.usefixtures("mock_get_sno")
+    def test_add_metric_data(self, client):
+        node_metric_map = NodeCollector(client)._gen_node_metric_map()
+        metric = node_metric_map['storj_total_diskspace']
+        result = StorjCollector(client)._add_metric_data(metric)
+        assert result.name == 'storj_total_diskspace'
+        assert result.documentation == 'Storj total diskspace metrics'
+        assert len(result.samples) == 3
+
+    def test_add_metric_data_api_fail(self, client):
+        node_metric_map = NodeCollector(client)._gen_node_metric_map()
+        metric = node_metric_map['storj_total_diskspace']
+        result = StorjCollector(client)._add_metric_data(metric)
+        assert result is None
+
+    @pytest.mark.usefixtures("gauge_dict")
+    def test_get_metric_values(self, client, gauge_dict):
+        labels_list, value = StorjCollector._get_metric_values(
+            StorjCollector(client), gauge_dict, 'gauge', 'used')
+        assert labels_list == ['used']
+        assert value == 3498284766336
+
+    @pytest.mark.usefixtures("gauge_dict")
+    def test_get_metric_value(self, gauge_dict):
+        value = StorjCollector._get_metric_value(gauge_dict, 'gauge', 'used')
+        assert value == 3498284766336
+
+    def test_sum_list_of_dicts(self, list_of_dicts):
+        sum_dict = StorjCollector._sum_list_of_dicts(list_of_dicts, 'egress')
         assert sum_dict == {'repair': 3, 'audit': 6, 'usage': 9}
-        sum_dict = StorjCollector._sum_list_of_dicts_by_key(list_of_dicts, 'test')
+        sum_dict = StorjCollector._sum_list_of_dicts(list_of_dicts, 'test')
         assert sum_dict == {}
-        sum_dict = StorjCollector._sum_list_of_dicts_by_key(list_of_dicts, 'test', None)
+        sum_dict = StorjCollector._sum_list_of_dicts(list_of_dicts, 'test', None)
         assert sum_dict is None
 
     def test_safe_list_get(self):
@@ -64,3 +72,6 @@ class TestStorjCollector:
         assert StorjCollector._safe_list_get(list, 1) == 1
         assert StorjCollector._safe_list_get(list, 5) == {}
         assert StorjCollector._safe_list_get(list, 5, None) is None
+
+
+# class TestNodeCollector:

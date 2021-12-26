@@ -7,6 +7,9 @@ class StorjCollector(object):
         self.client = client
         self._refresh_data()
 
+    def _refresh_data(self):
+        pass
+
     def collect(self):
         pass
 
@@ -19,7 +22,7 @@ class StorjCollector(object):
         metric_object = metric['metric_object']
         dict_keys = metric['dict_keys']
         extra_labels = metric['extra_labels']
-        if metric['dict']:
+        if dict:
             for label_value in dict_keys:
                 labels_list, value = self._get_metric_values(
                     dict, metric_object.type, label_value, extra_labels)
@@ -33,7 +36,8 @@ class StorjCollector(object):
             value = self._get_metric_value(dict, metric_type, label_value)
         return labels_list, value
 
-    def _get_metric_value(self, dict, metric_type, label_value):
+    @staticmethod
+    def _get_metric_value(dict, metric_type, label_value):
         value = 0.0
         if metric_type == "info":
             value = {label_value: str(dict[label_value])}
@@ -42,11 +46,11 @@ class StorjCollector(object):
         return value
 
     @staticmethod
-    def _sum_list_of_dicts_by_key(list, path, default={}):
+    def _sum_list_of_dicts(list, path, default={}):
         _counter = Counter()
         try:
-            for day in list:
-                _counter.update(day[path])
+            for i in list:
+                _counter.update(i[path])
             return dict(_counter)
         except Exception:
             return default
@@ -61,7 +65,7 @@ class StorjCollector(object):
 
 class NodeCollector(StorjCollector):
     def _refresh_data(self):
-        self._node = self.client.node
+        self._node = self.client.node()
 
     def collect(self):
         self._refresh_data()
@@ -76,6 +80,9 @@ class NodeCollector(StorjCollector):
         * extend *MetricFamily classes - seems like a bad idea for compatibility
         * multiple flat dictionaries with matching keys - seems more complicated
         """
+        _diskSpace = self._node.get('diskSpace', None) if self._node else None
+        _bandwidth = self._node.get('bandwidth', None) if self._node else None
+
         _metricMap = {
             'storj_node': {
                 'metric_object': InfoMetricFamily(
@@ -86,7 +93,7 @@ class NodeCollector(StorjCollector):
                 'extra_labels': [],
                 'dict_keys': ['nodeID', 'wallet', 'lastPinged', 'upToDate', 'version',
                               'allowedVersion', 'startedAt'],
-                'dict': self._node(),
+                'dict': self._node,
             },
             'storj_total_diskspace': {
                 'metric_object': GaugeMetricFamily(
@@ -96,7 +103,7 @@ class NodeCollector(StorjCollector):
                 ),
                 'extra_labels': [],
                 'dict_keys': ['used', 'available', 'trash'],
-                'dict': self._node()['diskSpace'],
+                'dict': _diskSpace,
             },
             'storj_total_bandwidth': {
                 'metric_object': GaugeMetricFamily(
@@ -106,7 +113,7 @@ class NodeCollector(StorjCollector):
                 ),
                 'extra_labels': [],
                 'dict_keys': ['used', 'available'],
-                'dict': self._node()['bandwidth'],
+                'dict': _bandwidth,
             },
         }
         return _metricMap
@@ -125,31 +132,26 @@ class SatCollector(StorjCollector):
        will only have one values map item
      """
     def _refresh_data(self):
-        self._node = self.client.node
+        self._node = self.client.node()
 
     def collect(self):
         self._refresh_data()
-        for satellite in self._node()['satellites']:
+        for satellite in self._node['satellites']:
             _sat_data = self.client.satellite(satellite['id'])
-            _sat_data.update({'suspended': 0})
-            _sat_data.update({'disqualified': 0})
-            if satellite['disqualified']:
-                _sat_data.update({'disqualified': 1})
-            if satellite['suspended']:
-                _sat_data.update({'suspended': 1})
+            _suspended = 1 if satellite['suspended'] else 0
+            _disqualified = 1 if satellite['disqualified'] else 0
+            _sat_data.update({'suspended': _suspended})
+            _sat_data.update({'disqualified': _disqualified})
             _sat_metric_map = self._gen_sat_metric_map(
                 _sat_data, satellite['id'], satellite['url'])
             yield from self._collect_metric_map(_sat_metric_map)
 
     def _gen_sat_metric_map(self, _sat_data, _sat_id, _sat_url):
-        _sum_bandwidthDaily_ingress = self._sum_list_of_dicts_by_key(
-            _sat_data['bandwidthDaily'], "ingress")
-        _sum_bandwidthDaily_egress = self._sum_list_of_dicts_by_key(
-            _sat_data['bandwidthDaily'], "egress")
-        _today_bandwidth = self._safe_list_get(
-            _sat_data.get('bandwidthDaily', [{}]), -1)
-        _today_storage = self._safe_list_get(
-            _sat_data.get('storageDaily', None), -1)
+        _month_ingress = self._sum_list_of_dicts(_sat_data['bandwidthDaily'], "ingress")
+        _month_egress = self._sum_list_of_dicts(_sat_data['bandwidthDaily'], "egress")
+        _day_bandwidth = self._safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
+        _day_storage = self._safe_list_get(_sat_data.get('storageDaily', None), -1)
+        _audits = _sat_data.get('audits', None) if _sat_data else None
 
         _metricMap = {
             'storj_sat_summary': {
@@ -172,7 +174,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['auditScore', 'suspensionScore', 'onlineScore'],
-                'dict': _sat_data.get('audits', None),
+                'dict': _audits,
             },
             'storj_sat_month_egress': {
                 'metric_object': GaugeMetricFamily(
@@ -182,7 +184,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['repair', 'audit', 'usage'],
-                'dict': _sum_bandwidthDaily_egress,
+                'dict': _month_egress,
             },
             'storj_sat_month_ingress': {
                 'metric_object': GaugeMetricFamily(
@@ -192,7 +194,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['repair', 'usage'],
-                'dict': _sum_bandwidthDaily_ingress,
+                'dict': _month_ingress,
             },
             'storj_sat_day_egress': {
                 'metric_object': GaugeMetricFamily(
@@ -202,7 +204,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['repair', 'audit', 'usage'],
-                'dict': _today_bandwidth.get('egress', None),
+                'dict': _day_bandwidth.get('egress', None),
             },
             'storj_sat_day_ingress': {
                 'metric_object': GaugeMetricFamily(
@@ -212,7 +214,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['repair', 'usage'],
-                'dict': _today_bandwidth.get('ingress', None),
+                'dict': _day_bandwidth.get('ingress', None),
             },
             'storj_sat_day_storage': {
                 'metric_object': GaugeMetricFamily(
@@ -223,7 +225,7 @@ class SatCollector(StorjCollector):
                 ),
                 'extra_labels': [_sat_id, _sat_url],
                 'dict_keys': ['atRestTotal'],
-                'dict': _today_storage,
+                'dict': _day_storage,
             },
         }
         return _metricMap
