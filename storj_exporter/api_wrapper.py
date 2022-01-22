@@ -17,8 +17,8 @@ class ApiClient(object):
         session.mount('https://', http_adapter)
         return session
 
-    def _get(self, endpoint):
-        response = None
+    def _get(self, endpoint, default=None):
+        response = default
         try:
             url = self._api_url + endpoint
             response = self._session.get(url=url, timeout=self._timeout).json()
@@ -27,13 +27,13 @@ class ApiClient(object):
         return response
 
     def node(self):
-        return self._get('sno/')
+        return self._get('sno/', {})
 
     def payout(self):
-        return self._get('sno/estimated-payout')
+        return self._get('sno/estimated-payout', {})
 
     def satellite(self, sat_id):
-        return self._get('sno/satellite/' + sat_id)
+        return self._get('sno/satellite/' + sat_id, {})
 
     # yields a generator list of sat ids
     def sat_id_generator(self):

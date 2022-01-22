@@ -36,7 +36,7 @@ class TestApiClient:
 
     def test_node_fail(self, client):
         response = client.node()
-        assert response is None
+        assert response == {}
 
     @pytest.mark.usefixtures("mock_get_sno")
     def test_node_data_keys(self, client):
@@ -60,7 +60,7 @@ class TestApiClient:
 
     def test_payout_fail(self, client):
         response = client.payout()
-        assert response is None
+        assert response == {}
 
     @pytest.mark.usefixtures("mock_get_payout")
     def test_payout_data_keys(self, client):
@@ -79,7 +79,7 @@ class TestApiClient:
 
     def test_satellite_fail(self, client):
         response = client.satellite(pytest.sat_id)
-        assert response is None
+        assert response == {}
 
     @pytest.mark.usefixtures("mock_get_satellite")
     def test_satellite_data_keys(self, client):

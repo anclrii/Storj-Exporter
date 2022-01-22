@@ -10,7 +10,7 @@ from prometheus_client import MetricsHandler, make_wsgi_app
 from prometheus_client.core import REGISTRY
 from prometheus_client.exposition import ThreadingWSGIServer
 from api_wrapper import ApiClient
-from collectors import NodeCollector, SatCollector
+from collectors import NodeCollector, SatCollector, PayoutCollector
 
 
 class GracefulKiller:
@@ -76,9 +76,9 @@ def main():
     REGISTRY.register(node_collector)
 
     """Instantiate and register optional collectors"""
-    # if 'payout' in storj_collectors:
-    #     payout_collector = PayoutCollector(client)
-    #     REGISTRY.register(payout_collector)
+    if 'payout' in storj_collectors:
+        payout_collector = PayoutCollector(client)
+        REGISTRY.register(payout_collector)
     if 'sat' in storj_collectors:
         sat_collector = SatCollector(client)
         REGISTRY.register(sat_collector)

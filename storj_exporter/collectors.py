@@ -31,6 +31,7 @@ class StorjCollector(object):
 
     def _get_metric_values(self, dict, metric_type, label_value, extra_labels=[]):
         labels_list = []
+        value = 0.0
         if label_value in dict:
             labels_list = [label_value] + extra_labels
             value = self._get_metric_value(dict, metric_type, label_value)
@@ -41,8 +42,8 @@ class StorjCollector(object):
         value = 0.0
         if metric_type == "info":
             value = {label_value: str(dict[label_value])}
-        elif isinstance(dict[label_value], (int, float)):
-            value = dict[label_value]
+        elif isinstance(dict.get(label_value, None), (int, float)):
+            value = dict.get(label_value, None)
         return value
 
     @staticmethod
@@ -80,8 +81,8 @@ class NodeCollector(StorjCollector):
         * extend *MetricFamily classes - seems like a bad idea for compatibility
         * multiple flat dictionaries with matching keys - seems more complicated
         """
-        _diskSpace = self._node.get('diskSpace', None) if self._node else None
-        _bandwidth = self._node.get('bandwidth', None) if self._node else None
+        _diskSpace = self._node.get('diskSpace', None)
+        _bandwidth = self._node.get('bandwidth', None)
 
         _metricMap = {
             'storj_node': {
@@ -147,11 +148,13 @@ class SatCollector(StorjCollector):
             yield from self._collect_metric_map(_sat_metric_map)
 
     def _gen_sat_metric_map(self, _sat_data, _sat_id, _sat_url):
-        _month_ingress = self._sum_list_of_dicts(_sat_data['bandwidthDaily'], "ingress")
-        _month_egress = self._sum_list_of_dicts(_sat_data['bandwidthDaily'], "egress")
+        _month_ingress = self._sum_list_of_dicts(
+            _sat_data.get('bandwidthDaily', {}), "ingress")
+        _month_egress = self._sum_list_of_dicts(
+            _sat_data.get('bandwidthDaily', {}), "egress")
         _day_bandwidth = self._safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
         _day_storage = self._safe_list_get(_sat_data.get('storageDaily', None), -1)
-        _audits = _sat_data.get('audits', None) if _sat_data else None
+        _audits = _sat_data.get('audits', None)
 
         _metricMap = {
             'storj_sat_summary': {
@@ -231,6 +234,34 @@ class SatCollector(StorjCollector):
         return _metricMap
 
 
+class PayoutCollector(StorjCollector):
+    def _refresh_data(self):
+        self._payout = self.client.payout().get('currentMonth', {})
+
+    def collect(self):
+        self._refresh_data()
+        _payout_metric_map = self._gen_payout_metric_map()
+        yield from self._collect_metric_map(_payout_metric_map)
+
+    def _gen_payout_metric_map(self):
+        _metricMap = {
+            'storj_payout_currentMonth': {
+                'metric_object': GaugeMetricFamily(
+                    name='storj_payout_currentMonth',
+                    documentation='Storj estimated payouts for current month',
+                    labels=['type']
+                ),
+                'extra_labels': [],
+                'dict_keys': ['egressBandwidth', 'egressBandwidthPayout',
+                              'egressRepairAudit', 'egressRepairAuditPayout',
+                              'diskSpace', 'diskSpacePayout', 'heldRate', 'payout',
+                              'held'],
+                'dict': self._payout,
+            },
+        }
+        return _metricMap
+
+
 def print_samples(registry):
     for metric in registry.collect():
         for s in metric.samples:
@@ -239,12 +270,13 @@ def print_samples(registry):
 
 if __name__ == '__main__':
     from api_wrapper import ApiClient
-    # from collectors import NodeCollector, SatCollector
     from prometheus_client.core import REGISTRY
 
     client = ApiClient('http://localhost:14007/')
     node_collector = NodeCollector(client)
     sat_collector = SatCollector(client)
+    payout_collector = PayoutCollector(client)
     REGISTRY.register(node_collector)
     REGISTRY.register(sat_collector)
+    REGISTRY.register(payout_collector)
     print_samples(REGISTRY)
