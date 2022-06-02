@@ -74,13 +74,6 @@ class NodeCollector(StorjCollector):
         yield from self._collect_metric_map(_node_metric_map)
 
     def _gen_node_metric_map(self):
-        """
-        considered these options also:
-        * custom data structure object - doesn't seem to add much value compared to
-          dictionary
-        * extend *MetricFamily classes - seems like a bad idea for compatibility
-        * multiple flat dictionaries with matching keys - seems more complicated
-        """
         _diskSpace = self._node.get('diskSpace', None)
         _bandwidth = self._node.get('bandwidth', None)
 
@@ -121,17 +114,6 @@ class NodeCollector(StorjCollector):
 
 
 class SatCollector(StorjCollector):
-    """
-    TODO
-    * currently we create metric object per sattelite. Would be good to create  metric
-      object per metric and add metrics of each sat to same matric object.
-     * potentially split _metricMap into 2 maps - metric object map and values map
-     * iterate over sats and populate values map
-     * iterate over metrics object map and add valuesof all sats to each object then
-       yield
-     * this would also work for node metrics to keep things consisten where each metric
-       will only have one values map item
-     """
     def _refresh_data(self):
         self._node = self.client.node()
 
@@ -260,23 +242,3 @@ class PayoutCollector(StorjCollector):
             },
         }
         return _metricMap
-
-
-def print_samples(registry):
-    for metric in registry.collect():
-        for s in metric.samples:
-            print(s)
-
-
-if __name__ == '__main__':
-    from api_wrapper import ApiClient
-    from prometheus_client.core import REGISTRY
-
-    client = ApiClient('http://localhost:14007/')
-    node_collector = NodeCollector(client)
-    sat_collector = SatCollector(client)
-    payout_collector = PayoutCollector(client)
-    REGISTRY.register(node_collector)
-    REGISTRY.register(sat_collector)
-    REGISTRY.register(payout_collector)
-    print_samples(REGISTRY)

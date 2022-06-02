@@ -49,13 +49,3 @@ class ApiClient(object):
     def sat_data_generator(self):
         for id in self.sat_id_generator():
             yield self.satellite(id)
-
-
-if __name__ == '__main__':
-    client = ApiClient('http://localhost:14007/')
-    print(client.node())
-    print(client.payout())
-    for i in client.sat_id_generator():
-        print(i)
-    for i in client.sat_data_generator():
-        print(i)

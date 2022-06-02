@@ -31,13 +31,11 @@ class GracefulKiller:
 
 class HTTPRequestHandler(MetricsHandler):
     def do_GET(self):
-
         if self.path == "/status":
             message = dict(status="alive")
             self.send_response(200)
             self.end_headers()
             self.wfile.write(bytes(json.dumps(message), "utf-8"))
-
         else:
             return MetricsHandler.do_GET(self)
 
@@ -57,10 +55,6 @@ def start_wsgi_server(port, addr='', registry=REGISTRY):
     while not killer.kill_now:
         time.sleep(1)
 
-def print_samples(registry):
-    for metric in registry.collect():
-        for s in metric.samples:
-            print(s)
 
 def main():
     """Read in environment variables"""
