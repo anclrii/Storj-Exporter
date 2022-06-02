@@ -1,0 +1,692 @@
+{
+  "id": "12tRQrMTWUWwzwGh18i7Fqs67kmdhH9t6aToeiwbo5mfS2rUmo",
+  "storageDaily": [
+    {
+      "atRestTotal": 285726085970.724,
+      "intervalStart": "2022-02-01T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285643281622.32025,
+      "intervalStart": "2022-02-02T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285455827943.9498,
+      "intervalStart": "2022-02-03T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286074288018.71796,
+      "intervalStart": "2022-02-04T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285663999939.7269,
+      "intervalStart": "2022-02-05T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285669485145.27856,
+      "intervalStart": "2022-02-06T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285600412370.5811,
+      "intervalStart": "2022-02-07T00:00:00Z"
+    },
+    {
+      "atRestTotal": 295115717966.64264,
+      "intervalStart": "2022-02-08T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285724626564.38837,
+      "intervalStart": "2022-02-09T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285524978129.8587,
+      "intervalStart": "2022-02-10T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285792540565.8561,
+      "intervalStart": "2022-02-11T00:00:00Z"
+    },
+    {
+      "atRestTotal": 285106259773.9214,
+      "intervalStart": "2022-02-12T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284969751550.06464,
+      "intervalStart": "2022-02-13T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284111527325.8746,
+      "intervalStart": "2022-02-14T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284467175454.27045,
+      "intervalStart": "2022-02-15T00:00:00Z"
+    },
+    {
+      "atRestTotal": 275483417420.03156,
+      "intervalStart": "2022-02-16T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284364710201.8255,
+      "intervalStart": "2022-02-17T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284220277431.4077,
+      "intervalStart": "2022-02-18T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284424786855.5155,
+      "intervalStart": "2022-02-19T00:00:00Z"
+    },
+    {
+      "atRestTotal": 284243207348.1887,
+      "intervalStart": "2022-02-20T00:00:00Z"
+    },
+    {
+      "atRestTotal": 83107246037.5373,
+      "intervalStart": "2022-02-21T00:00:00Z"
+    }
+  ],
+  "bandwidthDaily": [
+    {
+      "egress": {
+        "repair": 10594560,
+        "audit": 37120,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 2166784
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-01T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 5813760,
+        "audit": 38144,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-02T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 4907776,
+        "audit": 29696,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 354560
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-03T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 3017216,
+        "audit": 38144,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 399104,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-04T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 3671040,
+        "audit": 50688,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-05T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 8130816,
+        "audit": 38912,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-06T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 1995520,
+        "audit": 39680,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 354560
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-07T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 7392768,
+        "audit": 35072,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 80384,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-08T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 7164928,
+        "audit": 35584,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 399104,
+        "usage": 354560
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-09T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 9221888,
+        "audit": 36352,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 798208,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-10T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 6831872,
+        "audit": 38912,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 1812224
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-11T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 6646272,
+        "audit": 42496,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 399104,
+        "usage": 354560
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-12T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 2764544,
+        "audit": 44288,
+        "usage": 2673408
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 2673920
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-13T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 1995520,
+        "audit": 38400,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-14T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 3192832,
+        "audit": 35584,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-15T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 71280128,
+        "audit": 34560,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 7697664,
+        "usage": 1221888
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-16T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 28727296,
+        "audit": 33792,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-17T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 45414400,
+        "audit": 32256,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-18T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 19031808,
+        "audit": 30208,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 1197312,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-19T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 12580096,
+        "audit": 38144,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-20T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 10790144,
+        "audit": 27392,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2022-02-21T00:00:00Z"
+    }
+  ],
+  "storageSummary": 5786489603636.681,
+  "bandwidthSummary": 294877952,
+  "egressSummary": 274614016,
+  "ingressSummary": 20263936,
+  "currentStorageUsed": 11855146240,
+  "audits": {
+    "auditScore": 1,
+    "suspensionScore": 1,
+    "onlineScore": 0.9876587609920943,
+    "satelliteName": "us2.storj.io:7777"
+  },
+  "auditHistory": {
+    "score": 0.9876587609920943,
+    "windows": [
+      {
+        "windowStart": "2022-01-22T12:00:00Z",
+        "totalCount": 60,
+        "onlineCount": 60
+      },
+      {
+        "windowStart": "2022-01-23T00:00:00Z",
+        "totalCount": 87,
+        "onlineCount": 87
+      },
+      {
+        "windowStart": "2022-01-23T12:00:00Z",
+        "totalCount": 67,
+        "onlineCount": 67
+      },
+      {
+        "windowStart": "2022-01-24T00:00:00Z",
+        "totalCount": 63,
+        "onlineCount": 63
+      },
+      {
+        "windowStart": "2022-01-24T12:00:00Z",
+        "totalCount": 48,
+        "onlineCount": 48
+      },
+      {
+        "windowStart": "2022-01-25T00:00:00Z",
+        "totalCount": 61,
+        "onlineCount": 61
+      },
+      {
+        "windowStart": "2022-01-25T12:00:00Z",
+        "totalCount": 51,
+        "onlineCount": 51
+      },
+      {
+        "windowStart": "2022-01-26T00:00:00Z",
+        "totalCount": 47,
+        "onlineCount": 47
+      },
+      {
+        "windowStart": "2022-01-26T12:00:00Z",
+        "totalCount": 75,
+        "onlineCount": 75
+      },
+      {
+        "windowStart": "2022-01-27T00:00:00Z",
+        "totalCount": 101,
+        "onlineCount": 101
+      },
+      {
+        "windowStart": "2022-01-27T12:00:00Z",
+        "totalCount": 58,
+        "onlineCount": 58
+      },
+      {
+        "windowStart": "2022-01-28T00:00:00Z",
+        "totalCount": 67,
+        "onlineCount": 67
+      },
+      {
+        "windowStart": "2022-01-28T12:00:00Z",
+        "totalCount": 62,
+        "onlineCount": 62
+      },
+      {
+        "windowStart": "2022-01-29T00:00:00Z",
+        "totalCount": 68,
+        "onlineCount": 68
+      },
+      {
+        "windowStart": "2022-01-29T12:00:00Z",
+        "totalCount": 63,
+        "onlineCount": 63
+      },
+      {
+        "windowStart": "2022-01-30T00:00:00Z",
+        "totalCount": 64,
+        "onlineCount": 64
+      },
+      {
+        "windowStart": "2022-01-30T12:00:00Z",
+        "totalCount": 70,
+        "onlineCount": 70
+      },
+      {
+        "windowStart": "2022-01-31T00:00:00Z",
+        "totalCount": 59,
+        "onlineCount": 59
+      },
+      {
+        "windowStart": "2022-01-31T12:00:00Z",
+        "totalCount": 72,
+        "onlineCount": 72
+      },
+      {
+        "windowStart": "2022-02-01T00:00:00Z",
+        "totalCount": 85,
+        "onlineCount": 85
+      },
+      {
+        "windowStart": "2022-02-01T12:00:00Z",
+        "totalCount": 86,
+        "onlineCount": 86
+      },
+      {
+        "windowStart": "2022-02-02T00:00:00Z",
+        "totalCount": 81,
+        "onlineCount": 81
+      },
+      {
+        "windowStart": "2022-02-02T12:00:00Z",
+        "totalCount": 80,
+        "onlineCount": 80
+      },
+      {
+        "windowStart": "2022-02-03T00:00:00Z",
+        "totalCount": 58,
+        "onlineCount": 58
+      },
+      {
+        "windowStart": "2022-02-03T12:00:00Z",
+        "totalCount": 73,
+        "onlineCount": 73
+      },
+      {
+        "windowStart": "2022-02-04T00:00:00Z",
+        "totalCount": 69,
+        "onlineCount": 69
+      },
+      {
+        "windowStart": "2022-02-04T12:00:00Z",
+        "totalCount": 86,
+        "onlineCount": 86
+      },
+      {
+        "windowStart": "2022-02-05T00:00:00Z",
+        "totalCount": 107,
+        "onlineCount": 107
+      },
+      {
+        "windowStart": "2022-02-05T12:00:00Z",
+        "totalCount": 102,
+        "onlineCount": 102
+      },
+      {
+        "windowStart": "2022-02-06T00:00:00Z",
+        "totalCount": 88,
+        "onlineCount": 88
+      },
+      {
+        "windowStart": "2022-02-06T12:00:00Z",
+        "totalCount": 81,
+        "onlineCount": 81
+      },
+      {
+        "windowStart": "2022-02-07T00:00:00Z",
+        "totalCount": 76,
+        "onlineCount": 76
+      },
+      {
+        "windowStart": "2022-02-07T12:00:00Z",
+        "totalCount": 84,
+        "onlineCount": 84
+      },
+      {
+        "windowStart": "2022-02-08T00:00:00Z",
+        "totalCount": 67,
+        "onlineCount": 67
+      },
+      {
+        "windowStart": "2022-02-08T12:00:00Z",
+        "totalCount": 89,
+        "onlineCount": 89
+      },
+      {
+        "windowStart": "2022-02-09T00:00:00Z",
+        "totalCount": 78,
+        "onlineCount": 78
+      },
+      {
+        "windowStart": "2022-02-09T12:00:00Z",
+        "totalCount": 82,
+        "onlineCount": 82
+      },
+      {
+        "windowStart": "2022-02-10T00:00:00Z",
+        "totalCount": 64,
+        "onlineCount": 64
+      },
+      {
+        "windowStart": "2022-02-10T12:00:00Z",
+        "totalCount": 96,
+        "onlineCount": 96
+      },
+      {
+        "windowStart": "2022-02-11T00:00:00Z",
+        "totalCount": 80,
+        "onlineCount": 80
+      },
+      {
+        "windowStart": "2022-02-11T12:00:00Z",
+        "totalCount": 87,
+        "onlineCount": 87
+      },
+      {
+        "windowStart": "2022-02-12T00:00:00Z",
+        "totalCount": 91,
+        "onlineCount": 91
+      },
+      {
+        "windowStart": "2022-02-12T12:00:00Z",
+        "totalCount": 94,
+        "onlineCount": 94
+      },
+      {
+        "windowStart": "2022-02-13T00:00:00Z",
+        "totalCount": 93,
+        "onlineCount": 93
+      },
+      {
+        "windowStart": "2022-02-13T12:00:00Z",
+        "totalCount": 90,
+        "onlineCount": 90
+      },
+      {
+        "windowStart": "2022-02-14T00:00:00Z",
+        "totalCount": 99,
+        "onlineCount": 91
+      },
+      {
+        "windowStart": "2022-02-14T12:00:00Z",
+        "totalCount": 91,
+        "onlineCount": 64
+      },
+      {
+        "windowStart": "2022-02-15T00:00:00Z",
+        "totalCount": 77,
+        "onlineCount": 77
+      },
+      {
+        "windowStart": "2022-02-15T12:00:00Z",
+        "totalCount": 70,
+        "onlineCount": 70
+      },
+      {
+        "windowStart": "2022-02-16T00:00:00Z",
+        "totalCount": 95,
+        "onlineCount": 95
+      },
+      {
+        "windowStart": "2022-02-16T12:00:00Z",
+        "totalCount": 231,
+        "onlineCount": 231
+      },
+      {
+        "windowStart": "2022-02-17T00:00:00Z",
+        "totalCount": 135,
+        "onlineCount": 86
+      },
+      {
+        "windowStart": "2022-02-17T12:00:00Z",
+        "totalCount": 124,
+        "onlineCount": 124
+      },
+      {
+        "windowStart": "2022-02-18T00:00:00Z",
+        "totalCount": 114,
+        "onlineCount": 114
+      },
+      {
+        "windowStart": "2022-02-18T12:00:00Z",
+        "totalCount": 127,
+        "onlineCount": 127
+      },
+      {
+        "windowStart": "2022-02-19T00:00:00Z",
+        "totalCount": 68,
+        "onlineCount": 68
+      },
+      {
+        "windowStart": "2022-02-19T12:00:00Z",
+        "totalCount": 98,
+        "onlineCount": 98
+      },
+      {
+        "windowStart": "2022-02-20T00:00:00Z",
+        "totalCount": 89,
+        "onlineCount": 89
+      },
+      {
+        "windowStart": "2022-02-20T12:00:00Z",
+        "totalCount": 90,
+        "onlineCount": 90
+      },
+      {
+        "windowStart": "2022-02-21T00:00:00Z",
+        "totalCount": 90,
+        "onlineCount": 90
+      },
+      {
+        "windowStart": "2022-02-21T12:00:00Z",
+        "totalCount": 16,
+        "onlineCount": 16
+      }
+    ]
+  },
+  "priceModel": {
+    "EgressBandwidth": 2000,
+    "RepairBandwidth": 1000,
+    "AuditBandwidth": 1000,
+    "DiskSpace": 150
+  },
+  "nodeJoinedAt": "2021-01-07T01:54:43.576738Z"
+}
