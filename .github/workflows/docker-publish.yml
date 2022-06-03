@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
-          PRERELEASE_SUFFIX: beta1
+          PRERELEASE_SUFFIX: beta2
           WITH_V: false
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

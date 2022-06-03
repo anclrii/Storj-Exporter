@@ -26,6 +26,15 @@ def fixture_mock_get_sno(requests_mock):
         payload = json.loads(f.read())
     requests_mock.get(url=f'{pytest.base_url}/api/sno/', json=payload)
 
+@pytest.fixture(name="mock_get_sno_missing_keys")
+def fixture_mock_get_sno_missing_keys(requests_mock):
+    payload = {'k1': 'v1', 'k2': 'v2', 'satellites':
+               [{"id": "12tRQrMT", 'k2': None},
+                {'k1': 'v1', 'k2': None},
+                {},
+                None]}
+    requests_mock.get(url=f'{pytest.base_url}/api/sno/', json=payload)
+
 @pytest.fixture(name="mock_get_payout")
 def fixture_mock_get_payout(requests_mock):
     with open(f'{pytest.mock_path}/payout.json', 'r') as f:
@@ -38,3 +47,8 @@ def fixture_mock_get_satellite(requests_mock):
     with open(f'{pytest.mock_path}/satellite.json', 'r') as f:
         payload = json.loads(f.read())
     requests_mock.get(url=matcher, json=payload)
+
+@pytest.fixture(name="mock_returns_none")
+def fixture_mock_returns_none(requests_mock):
+    matcher = re.compile(f'{pytest.base_url}/api/')
+    requests_mock.get(url=matcher, json=None)

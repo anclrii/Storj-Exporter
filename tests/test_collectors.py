@@ -3,6 +3,8 @@ from typing import Generator
 
 from storj_exporter.collectors import StorjCollector, NodeCollector, SatCollector
 from storj_exporter.collectors import PayoutCollector
+from prometheus_client.exposition import generate_latest
+
 
 @pytest.fixture(name="list_of_dicts")
 def fixture_mock_get_satellite():
@@ -31,7 +33,7 @@ class TestStorjCollector:
         result = StorjCollector(client)._collect_metric_map(node_metric_map)
         res_list = list(result)
         assert isinstance(result, Generator)
-        assert res_list == [None, None, None]
+        assert len(res_list) == 3
 
     @pytest.mark.usefixtures("mock_get_sno")
     def test_add_metric_data(self, client):
@@ -46,7 +48,7 @@ class TestStorjCollector:
         node_metric_map = NodeCollector(client)._gen_node_metric_map()
         metric = node_metric_map['storj_total_diskspace']
         result = StorjCollector(client)._add_metric_data(metric)
-        assert result is None
+        assert len(result.samples) == 0
 
     @pytest.mark.usefixtures("gauge_dict")
     def test_get_metric_values(self, client, gauge_dict):
@@ -108,6 +110,18 @@ class TestNodeCollector:
         assert isinstance(node_metric_map, dict)
         assert node_metric_map
 
+    @pytest.mark.usefixtures("mock_get_sno")
+    def test_exposition(self, client):
+        collector = NodeCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_exposition_api_none(self, client):
+        collector = NodeCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
+
 
 class TestSatCollector:
     @pytest.mark.usefixtures("mock_get_sno")
@@ -124,8 +138,15 @@ class TestSatCollector:
         g = collector.collect()
         assert isinstance(g, Generator)
 
-    @pytest.mark.usefixtures("mock_get_sno")
+    @pytest.mark.usefixtures("mock_get_sno_missing_keys")
     @pytest.mark.usefixtures("mock_get_satellite")
+    def test_collect_missing_keys(self, client):
+        collector = SatCollector(client)
+        result = collector.collect()
+        res_list = list(result)
+        assert isinstance(result, Generator)
+        assert len(res_list) == 7
+
     def test_gen_sat_metric_map(self, client):
         collector = SatCollector(client)
         collector._refresh_data()
@@ -135,15 +156,44 @@ class TestSatCollector:
         assert sat_metric_map
 
     @pytest.mark.usefixtures("mock_get_sno")
-    # @pytest.mark.usefixtures("mock_get_satellite")
-    def test_gen_sat_metric_map_failed(self, client):
+    @pytest.mark.usefixtures("mock_get_satellite")
+    def test_exposition(self, client):
+        collector = SatCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_refresh_data_api_none(self, client):
         collector = SatCollector(client)
         collector._refresh_data()
-        _sat_data = collector.client.satellite('id')
-        sat_metric_map = collector._gen_sat_metric_map(_sat_data, 'id', 'url')
-        assert isinstance(sat_metric_map, dict)
-        assert sat_metric_map
+        assert isinstance(collector._node, dict)
+        assert collector._node == {}
 
+    @pytest.mark.usefixtures("mock_get_sno")
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_collect_sat_none(self, client):
+        collector = SatCollector(client)
+        g = collector.collect()
+        assert isinstance(g, Generator)
+
+    @pytest.mark.usefixtures("mock_get_sno")
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_exposition_sat_none(self, client):
+        collector = SatCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_collect_node_none(self, client):
+        collector = SatCollector(client)
+        g = collector.collect()
+        assert isinstance(g, Generator)
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_exposition_node_none(self, client):
+        collector = SatCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
 
 class TestPayoutCollector:
     @pytest.mark.usefixtures("mock_get_payout")
@@ -160,8 +210,33 @@ class TestPayoutCollector:
         assert isinstance(g, Generator)
         assert len(list(g)) == len(collector._gen_payout_metric_map())
 
-    @pytest.mark.usefixtures("mock_get_sno")
     def test_gen_payout_metric_map(self, client):
         payout_metric_map = PayoutCollector(client)._gen_payout_metric_map()
         assert isinstance(payout_metric_map, dict)
         assert payout_metric_map
+
+    @pytest.mark.usefixtures("mock_get_payout")
+    def test_exposition(self, client):
+        collector = PayoutCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_refresh_data_api_none(self, client):
+        collector = PayoutCollector(client)
+        collector._refresh_data()
+        assert isinstance(collector._payout, dict)
+        assert collector._payout == {}
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_collect_api_none(self, client):
+        collector = PayoutCollector(client)
+        g = collector.collect()
+        assert isinstance(g, Generator)
+        assert len(list(g)) == len(collector._gen_payout_metric_map())
+
+    @pytest.mark.usefixtures("mock_returns_none")
+    def test_exposition_api_none(self, client):
+        collector = PayoutCollector(client)
+        output = generate_latest(collector)
+        assert isinstance(output, bytes)

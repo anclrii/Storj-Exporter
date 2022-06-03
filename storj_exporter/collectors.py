@@ -27,7 +27,7 @@ class StorjCollector(object):
                 labels_list, value = self._get_metric_values(
                     dict, metric_object.type, label_value, extra_labels)
                 metric_object.add_metric(labels_list, value)
-            return metric_object
+        return metric_object
 
     def _get_metric_values(self, dict, metric_type, label_value, extra_labels=[]):
         labels_list = []
@@ -119,15 +119,19 @@ class SatCollector(StorjCollector):
 
     def collect(self):
         self._refresh_data()
-        for satellite in self._node['satellites']:
-            _sat_data = self.client.satellite(satellite['id'])
-            _suspended = 1 if satellite['suspended'] else 0
-            _disqualified = 1 if satellite['disqualified'] else 0
-            _sat_data.update({'suspended': _suspended})
-            _sat_data.update({'disqualified': _disqualified})
-            _sat_metric_map = self._gen_sat_metric_map(
-                _sat_data, satellite['id'], satellite['url'])
-            yield from self._collect_metric_map(_sat_metric_map)
+        for satellite in self._node.get('satellites', []):
+            try:
+                _sat_id = satellite.get('id', None)
+                _sat_url = satellite.get('url', None)
+                _sat_data = self.client.satellite(_sat_id)
+                _suspended = 1 if satellite.get('suspended', None) else 0
+                _disqualified = 1 if satellite.get('disqualified', None) else 0
+                _sat_data.update({'suspended': _suspended})
+                _sat_data.update({'disqualified': _disqualified})
+                _sat_metric_map = self._gen_sat_metric_map(_sat_data, _sat_id, _sat_url)
+                yield from self._collect_metric_map(_sat_metric_map)
+            except Exception:
+                pass
 
     def _gen_sat_metric_map(self, _sat_data, _sat_id, _sat_url):
         _month_ingress = self._sum_list_of_dicts(
