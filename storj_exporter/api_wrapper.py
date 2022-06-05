@@ -34,18 +34,3 @@ class ApiClient(object):
 
     def satellite(self, sat_id):
         return self._get('sno/satellite/' + sat_id, {})
-
-    # yields a generator list of sat ids
-    def sat_id_generator(self):
-        try:
-            satellites = self.node().get('satellites', [])
-            for sat in satellites:
-                if 'id' in sat:
-                    yield sat['id']
-        except Exception:
-            pass
-
-    # yields a sat data generator
-    def sat_data_generator(self):
-        for id in self.sat_id_generator():
-            yield self.satellite(id)

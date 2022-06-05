@@ -26,7 +26,8 @@ class StorjCollector(object):
             for label_value in dict_keys:
                 labels_list, value = self._get_metric_values(
                     dict, metric_object.type, label_value, extra_labels)
-                metric_object.add_metric(labels_list, value)
+                if labels_list:
+                    metric_object.add_metric(labels_list, value)
         return metric_object
 
     def _get_metric_values(self, dict, metric_type, label_value, extra_labels=[]):

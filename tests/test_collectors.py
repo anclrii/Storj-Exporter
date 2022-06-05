@@ -21,19 +21,22 @@ def fixture_gauge_dict():
 
 class TestStorjCollector:
     @pytest.mark.usefixtures("mock_get_sno")
-    def test_collect_metric_map(self, client):
+    @pytest.mark.parametrize(
+        "mock_get_sno, expected_metrics, expected_samples",
+        [
+            ("success", 3, 7),
+            ("wrongtext", 3, 0),
+            ("missingkeys", 3, 0),
+            ("notfound", 3, 0),
+            ("timeout", 3, 0)
+        ],
+        indirect=['mock_get_sno'])
+    def test_collect_metric_map(self, client, expected_metrics, expected_samples):
         node_metric_map = NodeCollector(client)._gen_node_metric_map()
         result = StorjCollector(client)._collect_metric_map(node_metric_map)
         res_list = list(result)
-        assert isinstance(result, Generator)
-        assert len(res_list) == 3
-
-    def test_collect_metric_map_api_fail(self, client):
-        node_metric_map = NodeCollector(client)._gen_node_metric_map()
-        result = StorjCollector(client)._collect_metric_map(node_metric_map)
-        res_list = list(result)
-        assert isinstance(result, Generator)
-        assert len(res_list) == 3
+        assert len(res_list) == expected_metrics
+        assert len(res_list[0].samples) == expected_samples
 
     @pytest.mark.usefixtures("mock_get_sno")
     def test_add_metric_data(self, client):
@@ -91,6 +94,7 @@ class TestStorjCollector:
 
 class TestNodeCollector:
     @pytest.mark.usefixtures("mock_get_sno")
+    @pytest.mark.parametrize("mock_get_sno", [("success")], indirect=['mock_get_sno'])
     def test_refresh_data(self, client):
         collector = NodeCollector(client)
         collector._refresh_data()
@@ -137,15 +141,6 @@ class TestSatCollector:
         collector = SatCollector(client)
         g = collector.collect()
         assert isinstance(g, Generator)
-
-    @pytest.mark.usefixtures("mock_get_sno_missing_keys")
-    @pytest.mark.usefixtures("mock_get_satellite")
-    def test_collect_missing_keys(self, client):
-        collector = SatCollector(client)
-        result = collector.collect()
-        res_list = list(result)
-        assert isinstance(result, Generator)
-        assert len(res_list) == 7
 
     def test_gen_sat_metric_map(self, client):
         collector = SatCollector(client)
