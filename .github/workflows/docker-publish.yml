@@ -26,11 +26,12 @@ jobs:
           fetch-depth: '0'
       - name: Bump version and push tag
         id: bumpVersion
-        uses: anothrNick/github-tag-action@1.39.0
+        # uses: anothrNick/github-tag-action@1.39.0
+        uses: alexeyatbluescape/github-tag-action@bugfix/semver-empty-results
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
-          PRERELEASE_SUFFIX: beta2
+          PRERELEASE_SUFFIX: beta
           WITH_V: false
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

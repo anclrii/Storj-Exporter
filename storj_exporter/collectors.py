@@ -124,6 +124,8 @@ class SatCollector(StorjCollector):
             try:
                 _sat_id = satellite.get('id', None)
                 _sat_url = satellite.get('url', None)
+                if not _sat_id or not _sat_url:
+                    continue
                 _sat_data = self.client.satellite(_sat_id)
                 _suspended = 1 if satellite.get('suspended', None) else 0
                 _disqualified = 1 if satellite.get('disqualified', None) else 0
