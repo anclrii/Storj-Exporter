@@ -1,69 +1,193 @@
-from storj_exporter.metric_templates import GaugeMetricTemplate
+import pytest
+from storj_exporter.metric_templates import (
+    MetricTemplate,
+    InfoMetricTemplate,
+    GaugeMetricTemplate
+)
+from prometheus_client.core import (
+    GaugeMetricFamily,
+    InfoMetricFamily,
+    UnknownMetricFamily
+)
 
-class TestMetricTemplates:
+
+class TestMetricTemplate:
     def test_init(self):
-        template = GaugeMetricTemplate(
-            metric_name='storj_total_diskspace',
-            documentation='Storj total diskspace metrics',
-            data_dict={'used': 1, 'available': 2, 'trash': 3},
-            data_keys=['used', 'available', 'trash']
+        template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+            labels=['label1', 'label2'],
+            extra_labels_values=['label2_value']
         )
-        assert template.metric_name == 'storj_total_diskspace'
-        assert template.documentation == 'Storj total diskspace metrics'
-        assert template.data_dict == {'used': 1, 'available': 2, 'trash': 3}
-        assert template.data_keys == ['used', 'available', 'trash']
+        assert template.metric_name == 'test_metric_name'
+        assert template.documentation == 'test_documentation'
+        assert template.data_dict == {'test_key': 1.1}
+        assert template.data_keys == ['test_key']
+        assert template.labels == ['label1', 'label2']
+        assert template.extra_labels_values == ['label2_value']
+
+    def test_init_defaults(self):
+        gauge_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 'test_value'},
+            data_keys=['test_key']
+        )
+        assert gauge_template.metric_name == 'test_metric_name'
+        assert gauge_template.documentation == 'test_documentation'
+        assert gauge_template.data_dict == {'test_key': 'test_value'}
+        assert gauge_template.data_keys == ['test_key']
+        assert gauge_template.labels == ['type']
+        assert gauge_template.extra_labels_values == []
+
+    def test_get_value(self):
+        metric_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+        )
+        value = metric_template._get_value('test_key')
+        assert value == 1.1
+
+    def test_create_metric_object(self):
+        metric_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+        )
+        metric_object = metric_template._create_metric_object()
+        assert type(metric_object) == UnknownMetricFamily
+        assert metric_object.name == 'test_metric_name'
+        assert metric_object.documentation == 'test_documentation'
+        assert len(metric_object.samples) == 0
 
     def test_get_metric_object(self):
-        template = GaugeMetricTemplate(
-            metric_name='storj_total_diskspace',
-            documentation='Storj total diskspace metrics',
-            data_dict={'used': 1, 'available': 2, 'trash': 3},
-            data_keys=['used', 'available', 'trash']
+        metric_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+            labels=['label1', 'label2'],
+            extra_labels_values=['label2_value']
         )
-        metric_object = template.get_metric_object()
-        assert metric_object.name == 'storj_total_diskspace'
-        assert metric_object.documentation == 'Storj total diskspace metrics'
+        metric_object = metric_template.get_metric_object()
+        assert type(metric_object) == UnknownMetricFamily
+        assert metric_object.name == 'test_metric_name'
+        assert metric_object.documentation == 'test_documentation'
+        assert len(metric_object.samples) == 1
+        assert metric_object.samples[0].labels == {
+            'label1': 'test_key', 'label2': 'label2_value'}
+        assert metric_object.samples[0].value == 1.1
+
+    def test_get_metric_object_none_value(self):
+        metric_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': None},
+            data_keys=['test_key']
+        )
+        metric_object = metric_template.get_metric_object()
+        assert type(metric_object) == UnknownMetricFamily
+        assert metric_object.name == 'test_metric_name'
+        assert len(metric_object.samples) == 0
+
+    @pytest.mark.parametrize('value, expected_samples', [(1.1, 1), (None, 0)])
+    @pytest.mark.parametrize('extra_labels_values, expected_labels', [
+        (['l2_value'], {'l1': 'test_key', 'l2': 'l2_value'}),
+        ([], {'l1': 'test_key'}),
+    ])
+    def test_add_metric_samples(self, value, extra_labels_values, expected_samples,
+                                expected_labels):
+        metric_template = MetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': value},
+            data_keys=['test_key'],
+            labels=['l1', 'l2'],
+            extra_labels_values=extra_labels_values
+        )
+        metric_object = metric_template._create_metric_object()
+        metric_template._add_metric_samples(metric_object)
+        assert len(metric_object.samples) == expected_samples
+        if expected_samples > 0:
+            assert metric_object.samples[0].labels == expected_labels
 
 
+class TestGaugeMetricTemplate(object):
+    @pytest.mark.parametrize('value, expected', [
+        (1.1, 1.1),
+        ('1.1', 1.1),
+        (0, 0.0),
+        (True, 1.0),
+        (None, None),
+        ('test', None),
+        ('', None)
+    ])
+    def test_get_value(self, value, expected):
+        metric_template = GaugeMetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': value},
+            data_keys=['test_key'],
+        )
+        assert metric_template._get_value('test_key') == expected
+
+    def test_get_metric_object(self):
+        metric_template = GaugeMetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+            labels=['label1', 'label2'],
+            extra_labels_values=['label2_value']
+        )
+        metric_object = metric_template.get_metric_object()
+        assert type(metric_object) == GaugeMetricFamily
+        assert metric_object.name == 'test_metric_name'
+        assert metric_object.documentation == 'test_documentation'
+        assert len(metric_object.samples) == 1
+        assert metric_object.samples[0].labels == {
+            'label1': 'test_key', 'label2': 'label2_value'}
+        assert metric_object.samples[0].value == 1.1
 
 
-# class TestStorjCollector:
-#     @pytest.mark.usefixtures("mock_get_sno")
-#     @pytest.mark.parametrize("mock_get_sno",
-#                              [("success"), ("missingkeys"), ("timeout")],
-#                              indirect=True)
-#     def test_collect_metric_map(self, client):
-#         node_metric_map = NodeCollector(client)._gen_node_metric_map()
-#         result = StorjCollector(client)._collect_metric_map(node_metric_map)
-#         res_list = list(result)
-#         assert len(res_list) == len(NodeCollector(client)._gen_node_metric_map())
+class TestInfoMetricTemplate(object):
+    @pytest.mark.parametrize('value, expected', [
+        ('test', {'test_key': 'test'}),
+        ('1.1', {'test_key': '1.1'}),
+        ('', {'test_key': ''}),
+        (True, {'test_key': 'True'}),
+        (1.1, {'test_key': '1.1'}),
+        (0, {'test_key': '0'}),
+        (None, None)
+    ])
+    def test_get_value(self, value, expected):
+        metric_template = InfoMetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': value},
+            data_keys=['test_key'],
+        )
+        assert metric_template._get_value('test_key') == expected
 
-#     @pytest.mark.usefixtures("mock_get_sno")
-#     @pytest.mark.parametrize("mock_get_sno, expected_samples",
-#                              [("success", 3), ("missingkeys", 0), ("timeout", 0)],
-#                              indirect=['mock_get_sno'])
-#     def test_add_metric_data(self, client, expected_samples):
-#         node_metric_map = NodeCollector(client)._gen_node_metric_map()
-#         metric = node_metric_map['storj_total_diskspace']
-#         result = StorjCollector(client)._add_metric_data(metric)
-#         assert result.name == 'storj_total_diskspace'
-#         assert result.documentation == 'Storj total diskspace metrics'
-#         assert len(result.samples) == expected_samples
-
-#     @pytest.mark.parametrize("key, expected_labels, expected_value", [
-#         ("used", 1, 42),
-#         ("missing", 0, 0.0)])
-#     def test_get_metric_values(self, gauge_dict, client, key, expected_labels,
-#                                expected_value):
-#         labels_list, value = StorjCollector._get_metric_values(
-#             StorjCollector(client), gauge_dict, 'gauge', key)
-#         assert len(labels_list) == expected_labels
-#         assert value == expected_value
-
-#     @pytest.mark.parametrize("key, expected_value", [
-#         ("used", 42),
-#         ("missing", 0.0)])
-#     def test_get_metric_value(self, gauge_dict, key, expected_value):
-#         value = StorjCollector._get_metric_value(gauge_dict, 'gauge', key)
-#         assert value == expected_value
-
+    def test_get_metric_object(self):
+        metric_template = InfoMetricTemplate(
+            metric_name='test_metric_name',
+            documentation='test_documentation',
+            data_dict={'test_key': 1.1},
+            data_keys=['test_key'],
+            labels=['label1', 'label2'],
+            extra_labels_values=['label2_value']
+        )
+        metric_object = metric_template.get_metric_object()
+        assert type(metric_object) == InfoMetricFamily
+        assert metric_object.name == 'test_metric_name'
+        assert metric_object.documentation == 'test_documentation'
+        assert len(metric_object.samples) == 1
+        assert metric_object.samples[0].labels == {
+            'label1': 'test_key', 'label2': 'label2_value', 'test_key': '1.1'}
+        assert metric_object.samples[0].value == 1

@@ -12,16 +12,32 @@ def fixture_mock_get_satellite():
 
 
 class TestTools:
-    def test_sum_list_of_dicts(self, list_of_dicts):
-        sum_dict = tools._sum_list_of_dicts(list_of_dicts, 'egress')
+    def testsum_list_of_dicts(self, list_of_dicts):
+        sum_dict = tools.sum_list_of_dicts(list_of_dicts, 'egress')
         assert sum_dict == {'repair': 3, 'audit': 6, 'usage': 9}
-        sum_dict = tools._sum_list_of_dicts(list_of_dicts, 'test')
+        sum_dict = tools.sum_list_of_dicts(list_of_dicts, 'test')
         assert sum_dict == {}
-        sum_dict = tools._sum_list_of_dicts(list_of_dicts, 'test', None)
+        sum_dict = tools.sum_list_of_dicts(list_of_dicts, 'test', None)
         assert sum_dict is None
 
-    def test_safe_list_get(self):
+    def testsafe_list_get(self):
         list = [0, 1, 2]
-        assert tools._safe_list_get(list, 1) == 1
-        assert tools._safe_list_get(list, 5) == {}
-        assert tools._safe_list_get(list, 5, None) is None
+        assert tools.safe_list_get(list, 1) == 1
+        assert tools.safe_list_get(list, 5) == {}
+        assert tools.safe_list_get(list, 5, None) is None
+
+    @pytest.mark.parametrize('value, expected', [
+        (1, 1.0),
+        (1.1, 1.1),
+        (0, 0.0),
+        (None, None),
+        ('1.1', 1.1),
+        ('None', None),
+        ('test', None),
+        ('', None),
+        (True, 1.0),
+        (False, 0.0),
+        ([1.1], None)
+    ])
+    def test_to_float(self, value, expected):
+        assert tools.to_float(value) == expected
