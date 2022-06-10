@@ -8,7 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run tests
+      - name: Install pip requirements
+        run: pip install --no-cache-dir -r requirements.txt -r requirements_tests.txt
+      - name: Run flake8 lint
+        run: flake8
+      - name: Run unit tests
+        run: pytest -v tests/
+      - name: Test docker build
         run: docker build . --file Dockerfile
   push:
     needs: test
@@ -20,7 +26,8 @@ jobs:
           fetch-depth: '0'
       - name: Bump version and push tag
         id: bumpVersion
-        uses: anothrNick/github-tag-action@1.34.0
+        # uses: anothrNick/github-tag-action@1.39.0
+        uses: alexeyatbluescape/github-tag-action@bugfix/semver-empty-results
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch

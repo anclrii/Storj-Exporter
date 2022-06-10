@@ -1,0 +1,66 @@
+{
+  "nodeID": "1Xf5b3xHn1ajoNRpJJJd3RebWUgZ58BVqNxKPAH2g1snSAEyNt",
+  "wallet": "0x187C8C43890fe4C91aFabbC62128D383A90548Dd",
+  "walletFeatures": null,
+  "satellites": [
+    {
+      "id": "12tRQrMTWUWwzwGh18i7Fqs67kmdhH9t6aToeiwbo5mfS2rUmo",
+      "url": "us2.storj.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 12177187840
+    },
+    {
+      "id": "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE",
+      "url": "saltlake.tardigrade.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 565448509696
+    },
+    {
+      "id": "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6",
+      "url": "ap1.storj.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 580301603072
+    },
+    {
+      "id": "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S",
+      "url": "us1.storj.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 479799123584
+    },
+    {
+      "id": "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs",
+      "url": "eu1.storj.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 638892699392
+    },
+    {
+      "id": "12rfG3sh9NCWiX3ivPjq2HtdLmbqCrvHVEzJubnzFzosMuawymB",
+      "url": "europe-north-1.tardigrade.io:7777",
+      "disqualified": null,
+      "suspended": null,
+      "currentStorageUsed": 1219752272128
+    }
+  ],
+  "diskSpace": {
+    "used": 3498961522560,
+    "available": 3500000000000,
+    "trash": 545221632,
+    "overused": 0
+  },
+  "bandwidth": {
+    "used": 23775641088,
+    "available": 0
+  },
+  "lastPinged": "2022-06-02T19:55:37.558864231Z",
+  "version": "1.55.1",
+  "allowedVersion": "1.24.0",
+  "upToDate": true,
+  "startedAt": "2022-05-20T11:04:34.809024612Z",
+  "configuredPort": "28967",
+  "quicEnabled": false
+}

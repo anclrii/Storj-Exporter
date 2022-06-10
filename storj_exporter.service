@@ -7,7 +7,7 @@ After=docker.service
 User=storj_exporter
 Group=storj_exporter
 Type=simple
-ExecStart=/usr/bin/python3 /usr/local/bin/storj-exporter.py
+ExecStart=/usr/bin/python3 /opt/storj_exporter/
 Restart=on-failure
 RestartSec=5s
 
