@@ -1,5 +1,5 @@
-from storj_exporter import tools
-from storj_exporter.metric_templates import GaugeMetricTemplate, InfoMetricTemplate
+from metric_templates import GaugeMetricTemplate, InfoMetricTemplate
+from utils import sum_list_of_dicts, safe_list_get
 
 
 class StorjCollector(object):
@@ -80,12 +80,12 @@ class SatCollector(StorjCollector):
                 pass
 
     def _get_metric_template_map(self, _sat_data, _sat_id, _sat_url):
-        _month_ingress = tools.sum_list_of_dicts(
+        _month_ingress = sum_list_of_dicts(
             _sat_data.get('bandwidthDaily', {}), "ingress")
-        _month_egress = tools.sum_list_of_dicts(
+        _month_egress = sum_list_of_dicts(
             _sat_data.get('bandwidthDaily', {}), "egress")
-        _day_bandwidth = tools.safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
-        _day_storage = tools.safe_list_get(_sat_data.get('storageDaily', None), -1)
+        _day_bandwidth = safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
+        _day_storage = safe_list_get(_sat_data.get('storageDaily', None), -1)
         _audits = _sat_data.get('audits', None)
 
         _metric_template_map = [

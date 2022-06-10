@@ -45,11 +45,10 @@ In this example `storagenode1, storagenode2, storagenode3` are the names of stor
     Dependencies: python3 python3-pip
     pip3 install prometheus_client
     
-##### Move storj_exporter to binary directory
+##### Move storj_exporter directory to a desired location
 
-    mv Storj-Exporter/storj-exporter.py /usr/local/bin/
-    chown storj_exporter:storj_exporter /usr/local/bin/storj-exporter.py
-    chmod +x /usr/local/bin/storj-exporter.py
+    mv storj_exporter/ /opt/
+    chown storj_exporter:storj_exporter /opt/storj_exporter/
    
 ##### Install systemd service and set to start on boot
     
@@ -60,7 +59,7 @@ In this example `storagenode1, storagenode2, storagenode3` are the names of stor
 
 ##### Standalone script
 
-    python3 storj-exporter.py
+    python3 /path/to/storj_exporter/
 
 ## Installing full monitoring stack (Prometheus + Grafana + Dashboard)
 

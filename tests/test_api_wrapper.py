@@ -1,7 +1,7 @@
 import requests
 import pytest
-
 from storj_exporter.api_wrapper import ApiClient
+
 
 class TestApiClient:
     def test_init_default_attributes(self, client):

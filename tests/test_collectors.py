@@ -1,8 +1,8 @@
 import pytest
-
 from storj_exporter.collectors import StorjCollector, NodeCollector, SatCollector
 from storj_exporter.collectors import PayoutCollector
 from prometheus_client.exposition import generate_latest
+
 
 @pytest.fixture
 def gauge_dict():

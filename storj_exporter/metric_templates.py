@@ -4,7 +4,8 @@ from prometheus_client.core import (
     InfoMetricFamily,
     UnknownMetricFamily
 )
-from storj_exporter import tools
+from utils import to_float
+
 
 @dataclass
 class MetricTemplate(object):
@@ -14,7 +15,6 @@ class MetricTemplate(object):
     data_keys: list
     labels: list = field(default_factory=lambda: ['type'])
     extra_labels_values: list = field(default_factory=lambda: [])
-
     _metric_class = UnknownMetricFamily
 
     def _get_value(self, key):
@@ -37,6 +37,7 @@ class MetricTemplate(object):
             if labels_list and value is not None:
                 _metric_object.add_metric(labels_list, value)
 
+
 @dataclass
 class GaugeMetricTemplate(MetricTemplate):
     _metric_class = GaugeMetricFamily
@@ -44,7 +45,7 @@ class GaugeMetricTemplate(MetricTemplate):
     def _get_value(self, key):
         value = self.data_dict.get(key, None)
         if value is not None:
-            value = tools.to_float(value)
+            value = to_float(value)
         return value
 
 

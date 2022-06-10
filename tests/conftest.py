@@ -2,9 +2,9 @@ import json
 import re
 import pytest
 import requests
-
 from storj_exporter.api_wrapper import ApiClient
 from storj_exporter.collectors import StorjCollector
+
 
 @pytest.fixture(autouse=True)
 def set_globals():
