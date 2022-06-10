@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install pip requirements
-        run: pip install --no-cache-dir -r requirements.txt
+        run: pip install --no-cache-dir -r requirements.txt -r requirements_tests.txt
       - name: Run flake8 lint
         run: flake8
       - name: Run unit tests

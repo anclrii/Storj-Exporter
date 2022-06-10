@@ -43,7 +43,7 @@ In this example `storagenode1, storagenode2, storagenode3` are the names of stor
 ##### Install package dependencies
 
     Dependencies: python3 python3-pip
-    pip3 install prometheus_client
+    pip3 install --no-cache-dir -r /requirements.txt
     
 ##### Move storj_exporter directory to a desired location
 
