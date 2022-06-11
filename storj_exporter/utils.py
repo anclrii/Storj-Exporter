@@ -29,3 +29,11 @@ def to_float(value):
     except Exception:
         value = None
     return value
+
+def nested_get(input_dict, nested_path):
+    internal_dict_value = input_dict
+    for k in nested_path:
+        internal_dict_value = internal_dict_value.get(k, None)
+        if internal_dict_value is None:
+            return None
+    return internal_dict_value

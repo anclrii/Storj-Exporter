@@ -25,7 +25,8 @@ class NodeCollector(StorjCollector):
         self._refresh_data()
         _metric_template_map = self._get_metric_template_map()
         for template in _metric_template_map:
-            yield template.get_metric_object()
+            template.add_metric_samples()
+            yield template.metric_object
 
     def _get_metric_template_map(self):
         _diskSpace = self._node.get('diskSpace', None)
@@ -35,8 +36,8 @@ class NodeCollector(StorjCollector):
                 metric_name='storj_node',
                 documentation='Storj node info',
                 data_dict=self._node,
-                data_keys=['nodeID', 'wallet', 'lastPinged', 'upToDate', 'version',
-                           'allowedVersion', 'startedAt']
+                data_keys=['nodeID', 'wallet', 'upToDate', 'version',
+                           'allowedVersion']
             ),
             GaugeMetricTemplate(
                 metric_name='storj_total_diskspace',
@@ -61,33 +62,50 @@ class SatCollector(StorjCollector):
     def collect(self):
         self._refresh_data()
         self._node = self.client.node()
+        _metric_template_map = self._get_metric_template_map({}, 'id', 'url')
         for satellite in self._node.get('satellites', []):
-            try:
-                _sat_id = satellite.get('id', None)
-                _sat_url = satellite.get('url', None)
-                if not _sat_id or not _sat_url:
-                    continue
-                _sat_data = self.client.satellite(_sat_id)
-                _suspended = 1 if satellite.get('suspended', None) else 0
-                _sat_data.update({'suspended': _suspended})
-                _disqualified = 1 if satellite.get('disqualified', None) else 0
-                _sat_data.update({'disqualified': _disqualified})
-                _metric_template_map = self._get_metric_template_map(
-                    _sat_data, _sat_id, _sat_url)
+            if satellite and isinstance(satellite, dict):
+                _sat_data, _sat_id, _sat_url = self._get_sat_data(satellite)
                 for template in _metric_template_map:
-                    yield template.get_metric_object()
-            except Exception:
-                pass
+                    template.data_dict = _sat_data
+                    template.extra_labels_values = [_sat_id, _sat_url]
+                    template.add_metric_samples()
+        for template in _metric_template_map:
+            yield template.metric_object
 
-    def _get_metric_template_map(self, _sat_data, _sat_id, _sat_url):
+    def _get_sat_data(self, satellite):
+        _sat_data = {}
+        _sat_id = satellite.get('id', None)
+        _sat_url = satellite.get('url', None)
+        if _sat_id and _sat_url:
+            _sat_data = self.client.satellite(_sat_id)
+            if _sat_data and isinstance(_sat_data, dict):
+                _sat_data = self._prepare_sat_data(satellite, _sat_data)
+        return _sat_data, _sat_id, _sat_url
+
+    def _prepare_sat_data(self, satellite, _sat_data):
+        _suspended = 1 if satellite.get('suspended', None) else 0
+        _sat_data.update({'suspended': _suspended})
+
+        _disqualified = 1 if satellite.get('disqualified', None) else 0
+        _sat_data.update({'disqualified': _disqualified})
+
         _month_ingress = sum_list_of_dicts(
             _sat_data.get('bandwidthDaily', {}), "ingress")
+        _sat_data.update({'month_ingress': _month_ingress})
+
         _month_egress = sum_list_of_dicts(
             _sat_data.get('bandwidthDaily', {}), "egress")
-        _day_bandwidth = safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
-        _day_storage = safe_list_get(_sat_data.get('storageDaily', None), -1)
-        _audits = _sat_data.get('audits', None)
+        _sat_data.update({'month_egress': _month_egress})
 
+        _day_bandwidth = safe_list_get(_sat_data.get('bandwidthDaily', [{}]), -1)
+        _sat_data.update({'day_bandwidth': _day_bandwidth})
+
+        _day_storage = safe_list_get(_sat_data.get('storageDaily', None), -1)
+        _sat_data.update({'day_storage': _day_storage})
+        return _sat_data
+
+    def _get_metric_template_map(self, _sat_data, _sat_id, _sat_url):
         _metric_template_map = [
             GaugeMetricTemplate(
                 metric_name='storj_sat_summary',
@@ -102,7 +120,8 @@ class SatCollector(StorjCollector):
             GaugeMetricTemplate(
                 metric_name='storj_sat_audit',
                 documentation='Storj satellite audit metrics',
-                data_dict=_audits,
+                data_dict=_sat_data,
+                nested_path=['audits'],
                 data_keys=['auditScore', 'suspensionScore', 'onlineScore'],
                 labels=['type', 'satellite', 'url'],
                 extra_labels_values=[_sat_id, _sat_url]
@@ -110,7 +129,8 @@ class SatCollector(StorjCollector):
             GaugeMetricTemplate(
                 metric_name='storj_sat_month_egress',
                 documentation='Storj satellite egress since current month start',
-                data_dict=_month_egress,
+                data_dict=_sat_data,
+                nested_path=['month_egress'],
                 data_keys=['repair', 'audit', 'usage'],
                 labels=['type', 'satellite', 'url'],
                 extra_labels_values=[_sat_id, _sat_url]
@@ -118,23 +138,8 @@ class SatCollector(StorjCollector):
             GaugeMetricTemplate(
                 metric_name='storj_sat_month_ingress',
                 documentation='Storj satellite ingress since current month start',
-                data_dict=_month_ingress,
-                data_keys=['repair', 'usage'],
-                labels=['type', 'satellite', 'url'],
-                extra_labels_values=[_sat_id, _sat_url]
-            ),
-            GaugeMetricTemplate(
-                metric_name='storj_sat_day_egress',
-                documentation='Storj satellite egress since current day start',
-                data_dict=_day_bandwidth,
-                data_keys=['repair', 'audit', 'usage'],
-                labels=['type', 'satellite', 'url'],
-                extra_labels_values=[_sat_id, _sat_url]
-            ),
-            GaugeMetricTemplate(
-                metric_name='storj_sat_day_ingress',
-                documentation='Storj satellite ingress since current day start',
-                data_dict=_day_bandwidth,
+                data_dict=_sat_data,
+                nested_path=['month_ingress'],
                 data_keys=['repair', 'usage'],
                 labels=['type', 'satellite', 'url'],
                 extra_labels_values=[_sat_id, _sat_url]
@@ -143,7 +148,8 @@ class SatCollector(StorjCollector):
                 metric_name='storj_sat_day_storage',
                 documentation='Storj satellite data stored on disk since current '
                               'day start',
-                data_dict=_day_storage,
+                data_dict=_sat_data,
+                nested_path=['day_storage'],
                 data_keys=['atRestTotal'],
                 labels=['type', 'satellite', 'url'],
                 extra_labels_values=[_sat_id, _sat_url]
@@ -160,7 +166,8 @@ class PayoutCollector(StorjCollector):
         self._refresh_data()
         _metric_template_map = self._get_metric_template_map()
         for template in _metric_template_map:
-            yield template.get_metric_object()
+            template.add_metric_samples()
+            yield template.metric_object
 
     def _get_metric_template_map(self):
         _metric_template_map = [
