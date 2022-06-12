@@ -106,6 +106,7 @@ class TestSatCollector:
         for metric in res_list:
             assert len(metric.samples) >= expected_samples
 
+    @pytest.mark.usefixtures("mock_get_sno")
     @pytest.mark.usefixtures("mock_get_satellite")
     @pytest.mark.parametrize("mock_get_satellite",
                              [("success"), ("notfound"), ("timeout")],

@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.12
+FROM python:3.7.10-alpine3.12
 
 COPY requirements.txt /
 RUN pip install --no-cache-dir -r /requirements.txt
