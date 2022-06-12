@@ -27,6 +27,10 @@ class TestMetricTemplate:
         assert template.data_keys == ['test_key']
         assert template.labels == ['label1', 'label2']
         assert template.extra_labels_values == ['label2_value']
+        assert type(template.metric_object) == UnknownMetricFamily
+        assert template.metric_object.name == 'test_metric_name'
+        assert template.metric_object.documentation == 'test_documentation'
+        assert len(template.metric_object.samples) == 0
 
     def test_init_defaults(self):
         gauge_template = MetricTemplate(
@@ -52,20 +56,7 @@ class TestMetricTemplate:
         value = metric_template._get_value('test_key')
         assert value == 1.1
 
-    def test_create_metric_object(self):
-        metric_template = MetricTemplate(
-            metric_name='test_metric_name',
-            documentation='test_documentation',
-            data_dict={'test_key': 1.1},
-            data_keys=['test_key'],
-        )
-        metric_object = metric_template._create_metric_object()
-        assert type(metric_object) == UnknownMetricFamily
-        assert metric_object.name == 'test_metric_name'
-        assert metric_object.documentation == 'test_documentation'
-        assert len(metric_object.samples) == 0
-
-    def test_get_metric_object(self):
+    def test_template_metric_object(self):
         metric_template = MetricTemplate(
             metric_name='test_metric_name',
             documentation='test_documentation',
@@ -74,7 +65,8 @@ class TestMetricTemplate:
             labels=['label1', 'label2'],
             extra_labels_values=['label2_value']
         )
-        metric_object = metric_template.get_metric_object()
+        metric_template.add_metric_samples()
+        metric_object = metric_template.metric_object
         assert type(metric_object) == UnknownMetricFamily
         assert metric_object.name == 'test_metric_name'
         assert metric_object.documentation == 'test_documentation'
@@ -83,14 +75,15 @@ class TestMetricTemplate:
             'label1': 'test_key', 'label2': 'label2_value'}
         assert metric_object.samples[0].value == 1.1
 
-    def test_get_metric_object_none_value(self):
+    def test_template_metric_object_none_value(self):
         metric_template = MetricTemplate(
             metric_name='test_metric_name',
             documentation='test_documentation',
             data_dict={'test_key': None},
             data_keys=['test_key']
         )
-        metric_object = metric_template.get_metric_object()
+        metric_template.add_metric_samples()
+        metric_object = metric_template.metric_object
         assert type(metric_object) == UnknownMetricFamily
         assert metric_object.name == 'test_metric_name'
         assert len(metric_object.samples) == 0
@@ -110,8 +103,8 @@ class TestMetricTemplate:
             labels=['l1', 'l2'],
             extra_labels_values=extra_labels_values
         )
-        metric_object = metric_template._create_metric_object()
-        metric_template._add_metric_samples(metric_object)
+        metric_template.add_metric_samples()
+        metric_object = metric_template.metric_object
         assert len(metric_object.samples) == expected_samples
         if expected_samples > 0:
             assert metric_object.samples[0].labels == expected_labels
@@ -145,7 +138,8 @@ class TestGaugeMetricTemplate(object):
             labels=['label1', 'label2'],
             extra_labels_values=['label2_value']
         )
-        metric_object = metric_template.get_metric_object()
+        metric_template.add_metric_samples()
+        metric_object = metric_template.metric_object
         assert type(metric_object) == GaugeMetricFamily
         assert metric_object.name == 'test_metric_name'
         assert metric_object.documentation == 'test_documentation'
@@ -183,7 +177,8 @@ class TestInfoMetricTemplate(object):
             labels=['label1', 'label2'],
             extra_labels_values=['label2_value']
         )
-        metric_object = metric_template.get_metric_object()
+        metric_template.add_metric_samples()
+        metric_object = metric_template.metric_object
         assert type(metric_object) == InfoMetricFamily
         assert metric_object.name == 'test_metric_name'
         assert metric_object.documentation == 'test_documentation'
