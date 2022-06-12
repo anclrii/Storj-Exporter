@@ -1,5 +1,8 @@
+import logging
 from metric_templates import GaugeMetricTemplate, InfoMetricTemplate
 from utils import sum_list_of_dicts, safe_list_get
+
+logger = logging.getLogger(__name__)
 
 
 class StorjCollector(object):
@@ -22,7 +25,9 @@ class NodeCollector(StorjCollector):
         self._node = self.client.node()
 
     def collect(self):
+        logger.debug(f'{self.__class__.__name__}.collect() called, refreshing data ...')
         self._refresh_data()
+        logger.debug(f'Creating metrics objects for {self.__class__.__name__}')
         _metric_template_map = self._get_metric_template_map()
         for template in _metric_template_map:
             template.add_metric_samples()
@@ -60,16 +65,20 @@ class SatCollector(StorjCollector):
         self._node = self.client.node()
 
     def collect(self):
+        logger.debug(f'{self.__class__.__name__}.collect() called, refreshing data ...')
         self._refresh_data()
-        self._node = self.client.node()
+        logger.debug(f'Creating metrics objects for {self.__class__.__name__}')
         _metric_template_map = self._get_metric_template_map({}, 'id', 'url')
         for satellite in self._node.get('satellites', []):
+            logger.debug(f'Processing satellite {satellite}')
             if satellite and isinstance(satellite, dict):
                 _sat_data, _sat_id, _sat_url = self._get_sat_data(satellite)
                 for template in _metric_template_map:
                     template.data_dict = _sat_data
                     template.extra_labels_values = [_sat_id, _sat_url]
                     template.add_metric_samples()
+            else:
+                logger.debug('Node data for satellite is invalid, skipping satellite')
         for template in _metric_template_map:
             yield template.metric_object
 
@@ -78,12 +87,19 @@ class SatCollector(StorjCollector):
         _sat_id = satellite.get('id', None)
         _sat_url = satellite.get('url', None)
         if _sat_id and _sat_url:
+            logger.debug(f'Getting data for satellite {_sat_url} ({_sat_id})')
             _sat_data = self.client.satellite(_sat_id)
             if _sat_data and isinstance(_sat_data, dict):
                 _sat_data = self._prepare_sat_data(satellite, _sat_data)
+            else:
+                logger.debug('Satellite data is invalid, skipping satellite')
+        else:
+            logger.debug(f'_sat_id = {_sat_id} and _sat_url = {_sat_url}, '
+                         'skipping satellite ...')
         return _sat_data, _sat_id, _sat_url
 
     def _prepare_sat_data(self, satellite, _sat_data):
+        logger.debug('Preparing satellite data for adding samples ...')
         _suspended = 1 if satellite.get('suspended', None) else 0
         _sat_data.update({'suspended': _suspended})
 
@@ -163,7 +179,9 @@ class PayoutCollector(StorjCollector):
         self._payout = self.client.payout().get('currentMonth', {})
 
     def collect(self):
+        logger.debug(f'{self.__class__.__name__}.collect() called, refreshing data ...')
         self._refresh_data()
+        logger.debug(f'Creating metrics objects for {self.__class__.__name__}')
         _metric_template_map = self._get_metric_template_map()
         for template in _metric_template_map:
             template.add_metric_samples()

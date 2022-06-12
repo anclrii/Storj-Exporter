@@ -15,6 +15,7 @@ from collectors import NodeCollector, SatCollector, PayoutCollector
 
 logger = logging.getLogger(__name__)
 
+
 class GracefulKiller:
     kill_now = False
     signals = {
@@ -77,10 +78,11 @@ def main():
 
     """Instantiate api client and node collector"""
     baseurl = 'http://' + storj_host_address + ':' + storj_api_port
-    logger.info(f'Starting storj exporter on port {storj_exporter_port},\
-                connecting to {baseurl} with collectors {storj_collectors} enabled')
+    logger.info(f'Starting storj exporter on port {storj_exporter_port}, '
+                f'connecting to {baseurl} with collectors {storj_collectors} enabled')
     client = ApiClient(baseurl)
     node_collector = NodeCollector(client)
+    logger.info('Registering node collector')
     REGISTRY.register(node_collector)
 
     """Instantiate and register optional collectors"""

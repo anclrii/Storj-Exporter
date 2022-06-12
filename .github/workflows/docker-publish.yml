@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8.5'
       - name: Install pip requirements
         run: pip install --no-cache-dir -r requirements.txt -r requirements_tests.txt
       - name: Run flake8 lint
