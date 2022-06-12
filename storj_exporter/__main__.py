@@ -5,6 +5,7 @@ import signal
 import threading
 import time
 import json
+import logging
 from wsgiref.simple_server import make_server
 from prometheus_client import MetricsHandler, make_wsgi_app
 from prometheus_client.core import REGISTRY
@@ -12,6 +13,7 @@ from prometheus_client.exposition import ThreadingWSGIServer
 from api_wrapper import ApiClient
 from collectors import NodeCollector, SatCollector, PayoutCollector
 
+logger = logging.getLogger(__name__)
 
 class GracefulKiller:
     kill_now = False
@@ -40,11 +42,12 @@ class HTTPRequestHandler(MetricsHandler):
             return MetricsHandler.do_GET(self)
 
     def log_message(self, format, *args):
-        """Log nothing."""
+        logger.debug("Client request: %s %s" % (self.address_string(), format % args))
 
 
 def start_wsgi_server(port, addr='', registry=REGISTRY):
     """Starts a WSGI server for prometheus metrics as a daemon thread."""
+    logger.info(f'Starting WSGI server on port {port}')
     app = make_wsgi_app(registry)
     httpd = make_server(addr, port, app, ThreadingWSGIServer,
                         handler_class=HTTPRequestHandler)
@@ -54,6 +57,7 @@ def start_wsgi_server(port, addr='', registry=REGISTRY):
     killer = GracefulKiller()
     while not killer.kill_now:
         time.sleep(1)
+    logger.info("Shutting down WSGI server")
 
 
 def main():
@@ -62,9 +66,19 @@ def main():
     storj_api_port = os.environ.get('STORJ_API_PORT', '14002')
     storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
     storj_collectors = os.environ.get('STORJ_COLLECTORS', 'payout sat').split()
+    log_level = os.environ.get('STORJ_EXPORTER_LOG_LEVEL', 'INFO').upper()
+
+    """Setup logging."""
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s [%(levelname)s]: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
 
     """Instantiate api client and node collector"""
     baseurl = 'http://' + storj_host_address + ':' + storj_api_port
+    logger.info(f'Starting storj exporter on port {storj_exporter_port},\
+                connecting to {baseurl} with collectors {storj_collectors} enabled')
     client = ApiClient(baseurl)
     node_collector = NodeCollector(client)
     REGISTRY.register(node_collector)
@@ -72,9 +86,11 @@ def main():
     """Instantiate and register optional collectors"""
     if 'payout' in storj_collectors:
         payout_collector = PayoutCollector(client)
+        logger.info('Registering payout collector')
         REGISTRY.register(payout_collector)
     if 'sat' in storj_collectors:
         sat_collector = SatCollector(client)
+        logger.info('Registering sat collector')
         REGISTRY.register(sat_collector)
 
     start_wsgi_server(storj_exporter_port, '')
