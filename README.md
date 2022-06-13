@@ -1,12 +1,16 @@
 ![Build](https://github.com/anclrii/Storj-Exporter/workflows/Build/badge.svg)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/anclrii/Storj-exporter)
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
+
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
+
 ## About
 
 Storj exporter for Prometheus written in python. It pulls information from storj node api for `node`, `satellite` and `payout` metrics.
 
 Also check out [Storj-Exporter-dashboard](https://github.com/anclrii/Storj-Exporter-dashboard) for Grafana to visualise metrics for multiple storj nodes.
 
-Tested with storj node versions listed in under `tests/api_mock/`
+Tested with storj node versions listed under `tests/api_mock/`
 
 <img src="https://github.com/anclrii/Storj-Exporter-dashboard/raw/master/storj-exporter-boom-table.png" alt="0x187C8C43890fe4C91aFabbC62128D383A90548Dd" hight=490 width=490 align="right"/> 
 
