@@ -176,7 +176,7 @@ class SatCollector(StorjCollector):
 
 class PayoutCollector(StorjCollector):
     def _refresh_data(self):
-        self._payout = self.client.payout().get('currentMonth', {})
+        self._payout = self.client.payout()
 
     def collect(self):
         logger.debug(f'{self.__class__.__name__}.collect() called, refreshing data ...')
@@ -188,15 +188,18 @@ class PayoutCollector(StorjCollector):
             yield template.metric_object
 
     def _get_metric_template_map(self):
+        _payout_data = self._payout.get('currentMonth', {})
+        _payout_data['currentMonthExpectations'] = self._payout.get(
+            'currentMonthExpectations', None)
         _metric_template_map = [
             GaugeMetricTemplate(
                 metric_name='storj_payout_currentMonth',
                 documentation='Storj estimated payouts for current month',
-                data_dict=self._payout,
+                data_dict=_payout_data,
                 data_keys=['egressBandwidth', 'egressBandwidthPayout',
                            'egressRepairAudit', 'egressRepairAuditPayout',
                            'diskSpace', 'diskSpacePayout', 'heldRate', 'payout',
-                           'held'],
+                           'held', 'currentMonthExpectations'],
             ),
         ]
         return _metric_template_map

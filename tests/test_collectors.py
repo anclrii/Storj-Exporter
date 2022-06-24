@@ -144,7 +144,7 @@ class TestSatCollector:
 class TestPayoutCollector:
     @pytest.mark.usefixtures("mock_get_payout")
     @pytest.mark.parametrize("mock_get_payout, expected_len",
-                             [("success", 9), ("notfound", 0), ("timeout", 0)],
+                             [("success", 3), ("notfound", 0), ("timeout", 0)],
                              indirect=['mock_get_payout'])
     def test_refresh_data(self, client, expected_len):
         collector = PayoutCollector(client)
@@ -156,7 +156,7 @@ class TestPayoutCollector:
     @pytest.mark.parametrize(
         "mock_get_payout, expected_metrics, expected_samples",
         [
-            ("success", 3, 9),
+            ("success", 3, 10),
             ("wrongtext", 3, 0),
             ("missingkeys", 3, 0),
             ("notfound", 3, 0),
@@ -183,7 +183,7 @@ class TestPayoutCollector:
     @pytest.mark.parametrize(
         "mock_get_payout, expected_len",
         [
-            ("success", 11),
+            ("success", 12),
             ("wrongtext", 2),
             ("missingkeys", 2),
             ("notfound", 2),
