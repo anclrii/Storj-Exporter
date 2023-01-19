@@ -42,7 +42,7 @@ class NodeCollector(StorjCollector):
                 documentation='Storj node info',
                 data_dict=self._node,
                 data_keys=['nodeID', 'wallet', 'upToDate', 'version',
-                           'allowedVersion']
+                           'allowedVersion','quicStatus']
             ),
             GaugeMetricTemplate(
                 metric_name='storj_total_diskspace',
