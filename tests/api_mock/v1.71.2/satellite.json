@@ -1,0 +1,442 @@
+{
+  "id": "12tRQrMTWUWwzwGh18i7Fqs67kmdhH9t6aToeiwbo5mfS2rUmo",
+  "storageDaily": [
+    {
+      "atRestTotal": 286680780438.3197,
+      "atRestTotalBytes": 12464381758.187813,
+      "intervalInHours": 23,
+      "intervalStart": "2023-02-01T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286871544283.57416,
+      "atRestTotalBytes": 11952981011.81559,
+      "intervalInHours": 24,
+      "intervalStart": "2023-02-02T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286727309130.90436,
+      "atRestTotalBytes": 12466404744.821928,
+      "intervalInHours": 23,
+      "intervalStart": "2023-02-03T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286824134209.6696,
+      "atRestTotalBytes": 11951005592.069567,
+      "intervalInHours": 24,
+      "intervalStart": "2023-02-04T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286796571156.7809,
+      "atRestTotalBytes": 11949857131.532537,
+      "intervalInHours": 24,
+      "intervalStart": "2023-02-05T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286793093391.87054,
+      "atRestTotalBytes": 11949712224.661272,
+      "intervalInHours": 24,
+      "intervalStart": "2023-02-06T00:00:00Z"
+    },
+    {
+      "atRestTotal": 287295429518.5878,
+      "atRestTotalBytes": 11970642896.607826,
+      "intervalInHours": 24,
+      "intervalStart": "2023-02-07T00:00:00Z"
+    },
+    {
+      "atRestTotal": 286774690658.73755,
+      "atRestTotalBytes": 12468464811.249458,
+      "intervalInHours": 23,
+      "intervalStart": "2023-02-08T00:00:00Z"
+    },
+    {
+      "atRestTotal": 71777209849.26886,
+      "atRestTotalBytes": 11962868308.211477,
+      "intervalInHours": 6,
+      "intervalStart": "2023-02-09T00:00:00Z"
+    }
+  ],
+  "bandwidthDaily": [
+    {
+      "egress": {
+        "repair": 11051520,
+        "audit": 171776,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-01T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 7109376,
+        "audit": 165376,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-02T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 5295360,
+        "audit": 104192,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-03T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 27842560,
+        "audit": 102912,
+        "usage": 6957312
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-04T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 24978688,
+        "audit": 97536,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-05T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 6429952,
+        "audit": 102912,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-06T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 6973184,
+        "audit": 102912,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-07T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 25440256,
+        "audit": 67840,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-08T00:00:00Z"
+    },
+    {
+      "egress": {
+        "repair": 3516672,
+        "audit": 37632,
+        "usage": 0
+      },
+      "ingress": {
+        "repair": 0,
+        "usage": 0
+      },
+      "delete": 0,
+      "intervalStart": "2023-02-09T00:00:00Z"
+    }
+  ],
+  "storageSummary": 2366540762637.7134,
+  "averageUsageBytes": 12126257608.795273,
+  "bandwidthSummary": 126547968,
+  "egressSummary": 126547968,
+  "ingressSummary": 0,
+  "currentStorageUsed": 11957487360,
+  "audits": {
+    "auditScore": 1,
+    "suspensionScore": 1,
+    "onlineScore": 0.9994903307112822,
+    "satelliteName": "us2.storj.io:7777"
+  },
+  "auditHistory": {
+    "score": 0.9994903307112822,
+    "windows": [
+      {
+        "windowStart": "2023-01-10T00:00:00Z",
+        "totalCount": 39,
+        "onlineCount": 39
+      },
+      {
+        "windowStart": "2023-01-10T12:00:00Z",
+        "totalCount": 24,
+        "onlineCount": 24
+      },
+      {
+        "windowStart": "2023-01-17T12:00:00Z",
+        "totalCount": 4,
+        "onlineCount": 4
+      },
+      {
+        "windowStart": "2023-01-18T00:00:00Z",
+        "totalCount": 9,
+        "onlineCount": 9
+      },
+      {
+        "windowStart": "2023-01-18T12:00:00Z",
+        "totalCount": 29,
+        "onlineCount": 29
+      },
+      {
+        "windowStart": "2023-01-19T00:00:00Z",
+        "totalCount": 24,
+        "onlineCount": 24
+      },
+      {
+        "windowStart": "2023-01-19T12:00:00Z",
+        "totalCount": 65,
+        "onlineCount": 65
+      },
+      {
+        "windowStart": "2023-01-20T00:00:00Z",
+        "totalCount": 123,
+        "onlineCount": 123
+      },
+      {
+        "windowStart": "2023-01-20T12:00:00Z",
+        "totalCount": 276,
+        "onlineCount": 276
+      },
+      {
+        "windowStart": "2023-01-21T00:00:00Z",
+        "totalCount": 331,
+        "onlineCount": 331
+      },
+      {
+        "windowStart": "2023-01-21T12:00:00Z",
+        "totalCount": 310,
+        "onlineCount": 310
+      },
+      {
+        "windowStart": "2023-01-22T00:00:00Z",
+        "totalCount": 324,
+        "onlineCount": 324
+      },
+      {
+        "windowStart": "2023-01-22T12:00:00Z",
+        "totalCount": 388,
+        "onlineCount": 388
+      },
+      {
+        "windowStart": "2023-01-23T00:00:00Z",
+        "totalCount": 353,
+        "onlineCount": 353
+      },
+      {
+        "windowStart": "2023-01-23T12:00:00Z",
+        "totalCount": 266,
+        "onlineCount": 266
+      },
+      {
+        "windowStart": "2023-01-24T00:00:00Z",
+        "totalCount": 309,
+        "onlineCount": 309
+      },
+      {
+        "windowStart": "2023-01-24T12:00:00Z",
+        "totalCount": 283,
+        "onlineCount": 283
+      },
+      {
+        "windowStart": "2023-01-25T00:00:00Z",
+        "totalCount": 197,
+        "onlineCount": 197
+      },
+      {
+        "windowStart": "2023-01-25T12:00:00Z",
+        "totalCount": 349,
+        "onlineCount": 349
+      },
+      {
+        "windowStart": "2023-01-26T00:00:00Z",
+        "totalCount": 349,
+        "onlineCount": 349
+      },
+      {
+        "windowStart": "2023-01-26T12:00:00Z",
+        "totalCount": 334,
+        "onlineCount": 334
+      },
+      {
+        "windowStart": "2023-01-27T00:00:00Z",
+        "totalCount": 315,
+        "onlineCount": 315
+      },
+      {
+        "windowStart": "2023-01-27T12:00:00Z",
+        "totalCount": 413,
+        "onlineCount": 413
+      },
+      {
+        "windowStart": "2023-01-28T00:00:00Z",
+        "totalCount": 298,
+        "onlineCount": 298
+      },
+      {
+        "windowStart": "2023-01-28T12:00:00Z",
+        "totalCount": 351,
+        "onlineCount": 351
+      },
+      {
+        "windowStart": "2023-01-29T00:00:00Z",
+        "totalCount": 366,
+        "onlineCount": 366
+      },
+      {
+        "windowStart": "2023-01-29T12:00:00Z",
+        "totalCount": 442,
+        "onlineCount": 442
+      },
+      {
+        "windowStart": "2023-01-30T00:00:00Z",
+        "totalCount": 381,
+        "onlineCount": 381
+      },
+      {
+        "windowStart": "2023-01-30T12:00:00Z",
+        "totalCount": 394,
+        "onlineCount": 394
+      },
+      {
+        "windowStart": "2023-01-31T00:00:00Z",
+        "totalCount": 331,
+        "onlineCount": 331
+      },
+      {
+        "windowStart": "2023-01-31T12:00:00Z",
+        "totalCount": 332,
+        "onlineCount": 331
+      },
+      {
+        "windowStart": "2023-02-01T00:00:00Z",
+        "totalCount": 304,
+        "onlineCount": 304
+      },
+      {
+        "windowStart": "2023-02-01T12:00:00Z",
+        "totalCount": 366,
+        "onlineCount": 366
+      },
+      {
+        "windowStart": "2023-02-02T00:00:00Z",
+        "totalCount": 320,
+        "onlineCount": 320
+      },
+      {
+        "windowStart": "2023-02-02T12:00:00Z",
+        "totalCount": 327,
+        "onlineCount": 327
+      },
+      {
+        "windowStart": "2023-02-03T00:00:00Z",
+        "totalCount": 187,
+        "onlineCount": 187
+      },
+      {
+        "windowStart": "2023-02-03T12:00:00Z",
+        "totalCount": 219,
+        "onlineCount": 219
+      },
+      {
+        "windowStart": "2023-02-04T00:00:00Z",
+        "totalCount": 208,
+        "onlineCount": 208
+      },
+      {
+        "windowStart": "2023-02-04T12:00:00Z",
+        "totalCount": 195,
+        "onlineCount": 195
+      },
+      {
+        "windowStart": "2023-02-05T00:00:00Z",
+        "totalCount": 129,
+        "onlineCount": 129
+      },
+      {
+        "windowStart": "2023-02-05T12:00:00Z",
+        "totalCount": 252,
+        "onlineCount": 252
+      },
+      {
+        "windowStart": "2023-02-06T00:00:00Z",
+        "totalCount": 176,
+        "onlineCount": 176
+      },
+      {
+        "windowStart": "2023-02-06T12:00:00Z",
+        "totalCount": 226,
+        "onlineCount": 226
+      },
+      {
+        "windowStart": "2023-02-07T00:00:00Z",
+        "totalCount": 191,
+        "onlineCount": 187
+      },
+      {
+        "windowStart": "2023-02-07T12:00:00Z",
+        "totalCount": 213,
+        "onlineCount": 213
+      },
+      {
+        "windowStart": "2023-02-08T00:00:00Z",
+        "totalCount": 112,
+        "onlineCount": 112
+      },
+      {
+        "windowStart": "2023-02-08T12:00:00Z",
+        "totalCount": 154,
+        "onlineCount": 154
+      },
+      {
+        "windowStart": "2023-02-09T00:00:00Z",
+        "totalCount": 130,
+        "onlineCount": 130
+      }
+    ]
+  },
+  "priceModel": {
+    "EgressBandwidth": 2000,
+    "RepairBandwidth": 1000,
+    "AuditBandwidth": 1000,
+    "DiskSpace": 150
+  },
+  "nodeJoinedAt": "2021-01-07T01:54:43.576738Z"
+}
