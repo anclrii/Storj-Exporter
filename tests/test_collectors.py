@@ -75,7 +75,7 @@ class TestNodeCollector:
 class TestSatCollector:
     @pytest.mark.usefixtures("mock_get_sno")
     @pytest.mark.parametrize("mock_get_sno, expected_len",
-                             [("success", 13), ("notfound", 0), ("timeout", 0)],
+                             [("success", 14), ("notfound", 0), ("timeout", 0)],
                              indirect=['mock_get_sno'])
     def test_refresh_data(self, client, expected_len):
         collector = SatCollector(client)
