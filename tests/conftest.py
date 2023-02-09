@@ -8,7 +8,7 @@ from storj_exporter.collectors import StorjCollector
 
 @pytest.fixture(autouse=True)
 def set_globals():
-    pytest.storj_version = 'v1.55.1'
+    pytest.storj_version = 'v1.71.2'
     pytest.base_url = 'http://storj-exporter.com'
     pytest.sat_id = '12tRQrMTWUWwzwGh18i7Fqs67kmdhH9t6aToeiwbo5mfS2rUmo'
     pytest.mock_path = f'tests/api_mock/{pytest.storj_version}'
