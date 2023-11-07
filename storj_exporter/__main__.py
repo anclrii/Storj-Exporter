@@ -65,6 +65,7 @@ def main():
     """Read in environment variables"""
     storj_host_address = os.environ.get('STORJ_HOST_ADDRESS', '127.0.0.1')
     storj_api_port = os.environ.get('STORJ_API_PORT', '14002')
+    storj_api_timeout = int(os.environ.get('STORJ_API_TIMEOUT', '90'))
     storj_exporter_port = int(os.environ.get('STORJ_EXPORTER_PORT', '9651'))
     storj_collectors = os.environ.get('STORJ_COLLECTORS', 'payout sat').split()
     log_level = os.environ.get('STORJ_EXPORTER_LOG_LEVEL', 'INFO').upper()
@@ -80,7 +81,7 @@ def main():
     baseurl = 'http://' + storj_host_address + ':' + storj_api_port
     logger.info(f'Starting storj exporter on port {storj_exporter_port}, '
                 f'connecting to {baseurl} with collectors {storj_collectors} enabled')
-    client = ApiClient(baseurl)
+    client = ApiClient(baseurl, timeout=storj_api_timeout)
     node_collector = NodeCollector(client)
     logger.info('Registering node collector')
     REGISTRY.register(node_collector)
