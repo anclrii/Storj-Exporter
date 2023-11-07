@@ -75,6 +75,7 @@ Following environment variables are available:
 | --- | --- | --- | --- |
 | STORJ_HOST_ADDRESS | Address of the storage node | storagenode | 127.0.0.1 |
 | STORJ_API_PORT | Storage node api port | 14002 | 14002 |
+| STORJ_API_TIMEOUT | Storage node api timeout | 90 | 90 |
 | STORJ_EXPORTER_PORT | A port that exporter opens to expose metrics on | 9651 | 9651 |
 | STORJ_COLLECTORS | A list of collectors | payout sat | payout sat |
 
