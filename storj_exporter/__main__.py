@@ -81,7 +81,7 @@ def main():
     baseurl = 'http://' + storj_host_address + ':' + storj_api_port
     logger.info(f'Starting storj exporter on port {storj_exporter_port}, '
                 f'connecting to {baseurl} with collectors {storj_collectors} enabled')
-    client = ApiClient(baseurl, timeout={storj_api_timeout})
+    client = ApiClient(baseurl, timeout=storj_api_timeout)
     node_collector = NodeCollector(client)
     logger.info('Registering node collector')
     REGISTRY.register(node_collector)
